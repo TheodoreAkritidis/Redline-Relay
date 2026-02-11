@@ -1,3 +1,5 @@
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,8 +7,8 @@ using UnityEngine.InputSystem;
 public class SimpleFpsController : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private Transform cameraPivot;   // empty at head height
-    [SerializeField] private Transform groundCheck;   // empty near feet
+    [SerializeField] private Transform cameraPivot;
+    [SerializeField] private Transform groundCheck;
 
     [Header("Move")]
     [SerializeField] private float moveSpeed = 6f;
@@ -23,13 +25,12 @@ public class SimpleFpsController : MonoBehaviour
     [SerializeField] private LayerMask groundMask;
 
     [Header("Air Control")]
-    [SerializeField] private float airControl = 0.35f; // 0 = no air steering, 1 = full
+    [SerializeField] private float airControl = 0.35f; // UNUSED, kept intentionally
 
     [Header("Debug")]
     [SerializeField] private bool showSpeedDebug = true;
 
     private GUIStyle speedStyle;
-
 
     private Rigidbody rb;
 
@@ -71,24 +72,19 @@ public class SimpleFpsController : MonoBehaviour
     private void FixedUpdate()
     {
         bool grounded = IsGrounded();
-
-        float speed = moveSpeed * (sprintHeld ? sprintMultiplier : 1f);
-
-        Vector3 wishDir = (transform.right * moveInput.x + transform.forward * moveInput.y);
-        wishDir = Vector3.ClampMagnitude(wishDir, 1f);
-
         Vector3 v = rb.linearVelocity;
-        Vector3 targetHorizontal = wishDir * speed;
 
         if (grounded)
         {
+            float speed = moveSpeed * (sprintHeld ? sprintMultiplier : 1f);
+
+            Vector3 wishDir =
+                (transform.right * moveInput.x + transform.forward * moveInput.y);
+            wishDir = Vector3.ClampMagnitude(wishDir, 1f);
+
+            Vector3 targetHorizontal = wishDir * speed;
+
             rb.linearVelocity = new Vector3(targetHorizontal.x, v.y, targetHorizontal.z);
-        }
-        else
-        {
-            Vector3 currentHorizontal = new Vector3(v.x, 0f, v.z);
-            Vector3 newHorizontal = Vector3.Lerp(currentHorizontal, targetHorizontal, airControl);
-            rb.linearVelocity = new Vector3(newHorizontal.x, v.y, newHorizontal.z);
         }
 
         if (jumpQueued)
@@ -118,10 +114,9 @@ public class SimpleFpsController : MonoBehaviour
     }
 
     // --- Input System (PlayerInput: Send Messages) ---
-    // Action names must match: Move, Look, Sprint, Jump
     public void OnMove(InputValue value) => moveInput = value.Get<Vector2>();
     public void OnLook(InputValue value) => lookDelta = value.Get<Vector2>();
-    public void OnSprint(InputValue value) => sprintHeld = value.isPressed;
+    public void OnSprint(InputValue value) => sprintHeld = value.Get<float>() > 0.1f;
     public void OnJump(InputValue value)
     {
         if (value.isPressed) jumpQueued = true;
@@ -149,5 +144,4 @@ public class SimpleFpsController : MonoBehaviour
             speedStyle
         );
     }
-
 }
