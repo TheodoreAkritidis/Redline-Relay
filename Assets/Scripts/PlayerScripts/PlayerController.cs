@@ -1,3 +1,4 @@
+// File: SimpleFpsController.cs
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,6 +8,7 @@ public class SimpleFpsController : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform cameraPivot;
     [SerializeField] private Transform groundCheck;
+    [SerializeField] private InventoryUITKView inventoryUI; // drag your UI GameObject (with InventoryUITKView) here
 
     [Header("Move")]
     [SerializeField] private float moveSpeed = 6f;
@@ -27,9 +29,6 @@ public class SimpleFpsController : MonoBehaviour
 
     [Header("Debug")]
     [SerializeField] private bool showSpeedDebug = true;
-
-    [Header("UI")]
-    [SerializeField] private InventoryUITKView inventoryUI;
 
     private GUIStyle speedStyle;
 
@@ -78,7 +77,7 @@ public class SimpleFpsController : MonoBehaviour
     {
         if (inventoryOpen)
         {
-            // Freeze horizontal movement while UI is open. Keep vertical so gravity behaves normally.
+            // Freeze horizontal movement while UI is open. Keep vertical for gravity.
             Vector3 v = rb.linearVelocity;
             rb.linearVelocity = new Vector3(0f, v.y, 0f);
             return;
@@ -131,7 +130,6 @@ public class SimpleFpsController : MonoBehaviour
 
         if (inventoryOpen)
         {
-            // Stop player intent immediately
             moveInput = Vector2.zero;
             lookDelta = Vector2.zero;
             sprintHeld = false;
@@ -145,9 +143,9 @@ public class SimpleFpsController : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
-        if (inventoryUI != null)
-            inventoryUI.SetOpen(open);
 
+        if (inventoryUI != null)
+            inventoryUI.SetOpen(inventoryOpen);
     }
 
     // --- Input System (PlayerInput: Send Messages) ---
