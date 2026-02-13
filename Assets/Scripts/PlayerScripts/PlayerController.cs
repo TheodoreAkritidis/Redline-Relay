@@ -1,5 +1,3 @@
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -30,6 +28,9 @@ public class SimpleFpsController : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool showSpeedDebug = true;
 
+    [Header("UI")]
+    [SerializeField] private InventoryUITKView inventoryUI;
+
     private GUIStyle speedStyle;
 
     private Rigidbody rb;
@@ -42,6 +43,8 @@ public class SimpleFpsController : MonoBehaviour
     private float pitch;
     private float yaw;
 
+    private bool inventoryOpen;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -53,12 +56,14 @@ public class SimpleFpsController : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        SetInventoryOpen(false);
     }
 
     private void Update()
     {
+        if (inventoryOpen)
+            return;
+
         yaw += lookDelta.x * lookSensitivity;
         pitch -= lookDelta.y * lookSensitivity;
         pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
@@ -71,20 +76,27 @@ public class SimpleFpsController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (inventoryOpen)
+        {
+            // Freeze horizontal movement while UI is open. Keep vertical so gravity behaves normally.
+            Vector3 v = rb.linearVelocity;
+            rb.linearVelocity = new Vector3(0f, v.y, 0f);
+            return;
+        }
+
         bool grounded = IsGrounded();
-        Vector3 v = rb.linearVelocity;
+        Vector3 v2 = rb.linearVelocity;
 
         if (grounded)
         {
             float speed = moveSpeed * (sprintHeld ? sprintMultiplier : 1f);
 
-            Vector3 wishDir =
-                (transform.right * moveInput.x + transform.forward * moveInput.y);
+            Vector3 wishDir = (transform.right * moveInput.x + transform.forward * moveInput.y);
             wishDir = Vector3.ClampMagnitude(wishDir, 1f);
 
             Vector3 targetHorizontal = wishDir * speed;
 
-            rb.linearVelocity = new Vector3(targetHorizontal.x, v.y, targetHorizontal.z);
+            rb.linearVelocity = new Vector3(targetHorizontal.x, v2.y, targetHorizontal.z);
         }
 
         if (jumpQueued)
@@ -113,13 +125,60 @@ public class SimpleFpsController : MonoBehaviour
         );
     }
 
+    private void SetInventoryOpen(bool open)
+    {
+        inventoryOpen = open;
+
+        if (inventoryOpen)
+        {
+            // Stop player intent immediately
+            moveInput = Vector2.zero;
+            lookDelta = Vector2.zero;
+            sprintHeld = false;
+            jumpQueued = false;
+
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        if (inventoryUI != null)
+            inventoryUI.SetOpen(open);
+
+    }
+
     // --- Input System (PlayerInput: Send Messages) ---
-    public void OnMove(InputValue value) => moveInput = value.Get<Vector2>();
-    public void OnLook(InputValue value) => lookDelta = value.Get<Vector2>();
-    public void OnSprint(InputValue value) => sprintHeld = value.Get<float>() > 0.1f;
+    public void OnMove(InputValue value)
+    {
+        if (inventoryOpen) { moveInput = Vector2.zero; return; }
+        moveInput = value.Get<Vector2>();
+    }
+
+    public void OnLook(InputValue value)
+    {
+        if (inventoryOpen) { lookDelta = Vector2.zero; return; }
+        lookDelta = value.Get<Vector2>();
+    }
+
+    public void OnSprint(InputValue value)
+    {
+        if (inventoryOpen) { sprintHeld = false; return; }
+        sprintHeld = value.Get<float>() > 0.1f;
+    }
+
     public void OnJump(InputValue value)
     {
+        if (inventoryOpen) return;
         if (value.isPressed) jumpQueued = true;
+    }
+
+    public void OnInventory(InputValue value)
+    {
+        if (!value.isPressed) return;
+        SetInventoryOpen(!inventoryOpen);
     }
 
     private void OnGUI()
