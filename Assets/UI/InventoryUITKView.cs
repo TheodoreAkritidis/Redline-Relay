@@ -3,12 +3,15 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-
 [RequireComponent(typeof(UIDocument))]
 public sealed class InventoryUITKView : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private UIDocument uiDocument;
+
+    [Header("Item Definitions (assign your real assets)")]
+    [SerializeField] private ItemDefinition wood;
+    [SerializeField] private ItemDefinition stone;
 
     [Header("Layout")]
     [SerializeField] private int backpackSlots = 30;
@@ -43,18 +46,10 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         player = new PlayerInventoryModel(hotbarSlots: 10, backpackSlots: backpackSlots);
 
-        // TEMP seed for testing UI quickly (remove later)
-        var wood = ScriptableObject.CreateInstance<ItemDefinition>();
-        wood.ItemId = "wood";
-        wood.MaxStack = 20;
-
-        var stone = ScriptableObject.CreateInstance<ItemDefinition>();
-        stone.ItemId = "stone";
-        stone.MaxStack = 50;
-
-        player.Hotbar.SetSlot(0, new ItemStack(wood, 12));
-        player.Backpack.SetSlot(0, new ItemStack(wood, 20));
-        player.Backpack.SetSlot(1, new ItemStack(stone, 7));
+        // Optional test seed (uses your real ItemDefinition assets)
+        if (wood != null) player.Hotbar.SetSlot(0, new ItemStack(wood, 12));
+        if (wood != null) player.Backpack.SetSlot(0, new ItemStack(wood, 20));
+        if (stone != null) player.Backpack.SetSlot(1, new ItemStack(stone, 7));
     }
 
     private void OnEnable()
@@ -75,7 +70,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         UpdateCursorVisual();
     }
 
-    // --- Input System (PlayerInput: Send Messages) ---
     public void SetOpen(bool open)
     {
         if (uiOpen == open) return;
@@ -83,16 +77,13 @@ public sealed class InventoryUITKView : MonoBehaviour
         uiOpen = open;
         root.style.display = uiOpen ? DisplayStyle.Flex : DisplayStyle.None;
 
-        // Per your rule: leaving menu should NOT drop items; it should snap back.
+        // Per your rule: leaving menu snaps held item back, never drops.
         if (!uiOpen)
         {
             InventoryRules.CancelCursorToOrigin(player.Cursor);
-            RefreshAll();
         }
-        else
-        {
-            RefreshAll();
-        }
+
+        RefreshAll();
     }
 
     private void BuildUI()
@@ -117,12 +108,10 @@ public sealed class InventoryUITKView : MonoBehaviour
             hotbarRow.Add(v.Root);
         }
 
-        // --- Backpack (wrap grid) ---
+        // --- Backpack ---
         backpackGrid = new VisualElement();
         backpackGrid.style.flexDirection = FlexDirection.Row;
         backpackGrid.style.flexWrap = Wrap.Wrap;
-
-        // Width constraint so Wrap produces consistent columns.
         backpackGrid.style.width = backpackColumns * slotSize.x + (backpackColumns - 1) * slotSpacing;
         root.Add(backpackGrid);
 
@@ -134,7 +123,7 @@ public sealed class InventoryUITKView : MonoBehaviour
             backpackGrid.Add(v.Root);
         }
 
-        // --- Cursor Visual (drawn on top) ---
+        // --- Cursor Visual (on top) ---
         cursorRoot = new VisualElement();
         cursorRoot.pickingMode = PickingMode.Ignore;
         cursorRoot.style.position = Position.Absolute;
@@ -174,19 +163,17 @@ public sealed class InventoryUITKView : MonoBehaviour
         cursorQty.style.paddingBottom = 1;
         cursorContainer.Add(cursorQty);
 
-        // Drop outside UI handler (only relevant while open)
+        // Drop-to-world on pointer-up outside slots
         root.RegisterCallback<PointerUpEvent>(OnRootPointerUp, TrickleDown.TrickleDown);
     }
 
     private SlotView CreateSlotView(IItemContainer container, int index)
     {
         var slot = new VisualElement();
-        slot.AddToClassList("inv-slot");
+        slot.AddToClassList("inv-slot"); // IMPORTANT: used to detect pointer up on slot
 
         slot.style.width = slotSize.x;
         slot.style.height = slotSize.y;
-
-        // Spacing (gap isn't supported reliably)
         slot.style.marginRight = slotSpacing;
         slot.style.marginBottom = slotSpacing;
 
@@ -225,7 +212,6 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         slot.RegisterCallback<PointerEnterEvent>(_ => slot.style.backgroundColor = new Color(0.22f, 0.22f, 0.22f, 1f));
         slot.RegisterCallback<PointerLeaveEvent>(_ => slot.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.9f));
-
         slot.RegisterCallback<PointerDownEvent>(evt => OnSlotPointerDown(evt, view));
 
         return view;
@@ -283,7 +269,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         return false;
     }
 
-
     private void RefreshAll()
     {
         for (int i = 0; i < hotbarViews.Length; i++)
@@ -315,11 +300,17 @@ public sealed class InventoryUITKView : MonoBehaviour
         var cursorContainer = cursorRoot.Q<VisualElement>("CursorContainer");
         if (cursorContainer == null) return;
 
-        // Uses screen-space mouse position; works best if UIDocument is full-screen.
-        var mouseDevice = Mouse.current;
-        if (mouseDevice == null) return; // no mouse connected
-        Vector2 mouse = mouseDevice.position.ReadValue();
+        if (!uiOpen)
+        {
+            cursorContainer.style.display = DisplayStyle.None;
+            return;
+        }
 
+        var mouseDevice = Mouse.current;
+        if (mouseDevice == null)
+            return;
+
+        Vector2 mouse = mouseDevice.position.ReadValue();
         cursorContainer.style.left = mouse.x - slotSize.x * 0.5f;
         cursorContainer.style.top = (Screen.height - mouse.y) - slotSize.y * 0.5f;
 
@@ -329,7 +320,7 @@ public sealed class InventoryUITKView : MonoBehaviour
             cursorQty.text = "";
             cursorContainer.style.display = DisplayStyle.None;
             return;
-        } 
+        }
 
         cursorContainer.style.display = DisplayStyle.Flex;
 
