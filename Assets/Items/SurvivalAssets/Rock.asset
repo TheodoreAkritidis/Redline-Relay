@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e00bb45fc057dc746852dfddd20611b7, type: 3}
   m_Name: Rock
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  ItemId: Rock
+  ItemId: rock
   Icon: {fileID: 21300000, guid: aae0ebd6c2c502a4bbbaa39f871c6c54, type: 3}
   MaxStack: 10
