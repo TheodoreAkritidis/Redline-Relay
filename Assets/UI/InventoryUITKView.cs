@@ -7,7 +7,7 @@ public sealed class InventoryUITKView : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private UIDocument uiDocument;
-    [SerializeField] private PlayerInventoryComponent playerInventory; // assign Player here (or auto-find)
+    [SerializeField] private PlayerInventoryComponent playerInventory;
 
     [Header("Layout")]
     [SerializeField] private int backpackColumns = 10;
@@ -16,23 +16,56 @@ public sealed class InventoryUITKView : MonoBehaviour
     [Header("Spacing")]
     [SerializeField] private float slotSpacing = 6f;
 
+    [Header("Crosshair")]
+    [SerializeField] private string idleCrosshairGlyph = ".";
+    [SerializeField] private int crosshairFontSize = 26;
+    [SerializeField] private int promptFontSize = 18;
+
+    private VisualElement hotbarAnchor;
+    private VisualElement hotbarPanel;
+
+    public bool IsBackpackOpen => backpackOpen;
+
+    private bool built;
+    private bool triedBuildThisFrame;
+
     private VisualElement root;
 
     // Always-visible hotbar HUD
     private VisualElement hotbarHud;
     private SlotView[] hotbarViews;
 
-    // Backpack overlay (only when open)
+    // Backpack overlay
     private VisualElement backpackOverlay;
     private VisualElement backpackGrid;
     private SlotView[] backpackViews;
 
-    // Cursor visual (only relevant when backpack open)
+    // Cursor visual
     private VisualElement cursorRoot;
     private Image cursorIcon;
     private Label cursorQty;
 
+    // Crosshair UI (same UIDocument)
+    private VisualElement crosshairRoot;
+    private Label crosshairLabel;
+
     private bool backpackOpen;
+
+    private bool CanBuildNow()
+    {
+        if (uiDocument == null) return false;
+        root = uiDocument.rootVisualElement;
+        if (root == null) return false;
+
+        if (playerInventory == null) return false;
+        var m = playerInventory.Model;
+        if (m == null) return false;
+        if (m.Hotbar == null) return false;
+        if (m.Backpack == null) return false;
+        if (m.Cursor == null) return false;
+
+        return true;
+    }
 
     private void Awake()
     {
@@ -42,23 +75,32 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private void OnEnable()
     {
-        root = uiDocument.rootVisualElement;
-        BuildUI();
-
-        // Start with backpack hidden; hotbar always visible.
-        SetBackpackOpen(false);
-
-        HookModelEvents();
-        RefreshAll();
+        built = false;
+        triedBuildThisFrame = false;
     }
 
     private void OnDisable()
     {
         UnhookModelEvents();
+        built = false;
+        triedBuildThisFrame = false;
     }
 
     private void Update()
     {
+        if (!built)
+        {
+            if (!triedBuildThisFrame && CanBuildNow())
+            {
+                triedBuildThisFrame = true;
+                BuildUI();
+                HookModelEvents();
+                built = true;
+                RefreshAll();
+            }
+            return;
+        }
+
         if (!backpackOpen) return;
         UpdateCursorVisual();
     }
@@ -66,60 +108,151 @@ public sealed class InventoryUITKView : MonoBehaviour
     public void SetBackpackOpen(bool open)
     {
         backpackOpen = open;
+        if (!built) return;
 
         if (backpackOverlay != null)
             backpackOverlay.style.display = backpackOpen ? DisplayStyle.Flex : DisplayStyle.None;
 
-        if (!backpackOpen && playerInventory != null)
-        {
-            // leaving menu snaps held item back
+        // Hide crosshair whenever inventory/backpack is open
+        SetCrosshairVisible(!backpackOpen);
+
+        if (!backpackOpen && playerInventory != null && playerInventory.Model != null)
             InventoryRules.CancelCursorToOrigin(playerInventory.Model.Cursor);
-        }
 
         RefreshAll();
+    }
+
+    // Called by PlayerInteractor
+    public void SetCrosshairDefault()
+    {
+        if (!built || crosshairLabel == null) return;
+        crosshairLabel.text = idleCrosshairGlyph;
+        crosshairLabel.style.fontSize = crosshairFontSize;
+    }
+
+    // Called by PlayerInteractor
+    public void SetCrosshairPrompt(string action)
+    {
+        if (!built || crosshairLabel == null) return;
+        string a = string.IsNullOrWhiteSpace(action) ? "Interact" : action.Trim();
+        crosshairLabel.text = $"E to {a}";
+        crosshairLabel.style.fontSize = promptFontSize;
+    }
+
+    public void SetCrosshairVisible(bool visible)
+    {
+        if (!built || crosshairRoot == null) return;
+        crosshairRoot.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     private void HookModelEvents()
     {
         if (playerInventory == null) return;
+
+        playerInventory.InventoryChanged -= RefreshAll;
+        playerInventory.HotbarSelectionChanged -= OnHotbarSelectionChanged;
+
         playerInventory.InventoryChanged += RefreshAll;
-        playerInventory.HotbarSelectionChanged += _ => RefreshHotbarSelection();
+        playerInventory.HotbarSelectionChanged += OnHotbarSelectionChanged;
     }
 
     private void UnhookModelEvents()
     {
         if (playerInventory == null) return;
         playerInventory.InventoryChanged -= RefreshAll;
-        playerInventory.HotbarSelectionChanged -= _ => RefreshHotbarSelection();
+        playerInventory.HotbarSelectionChanged -= OnHotbarSelectionChanged;
     }
+
+    private void OnHotbarSelectionChanged(int _) => RefreshHotbarSelection();
 
     private void BuildUI()
     {
+        if (uiDocument == null) return;
+        root = uiDocument.rootVisualElement;
+        if (root == null) return;
+
         root.Clear();
 
-        // Root is full screen container
         root.style.position = Position.Relative;
         root.style.width = Length.Percent(100);
         root.style.height = Length.Percent(100);
+        root.pickingMode = PickingMode.Ignore;
 
-        BuildHotbarHud();
+        
+        
         BuildBackpackOverlay();
+        BuildHotbarHud();
         BuildCursorVisual();
+        BuildCrosshairHud();  
+
+        if (backpackOverlay != null)
+            backpackOverlay.style.display = backpackOpen ? DisplayStyle.Flex : DisplayStyle.None;
+
+        SetCrosshairVisible(!backpackOpen);
+        SetCrosshairDefault();
     }
+
+    private void BuildCrosshairHud()
+    {
+        crosshairRoot = new VisualElement();
+        crosshairRoot.pickingMode = PickingMode.Ignore;
+
+        // Full-screen overlay that centers its children.
+        crosshairRoot.style.position = Position.Absolute;
+        crosshairRoot.style.left = 0;
+        crosshairRoot.style.right = 0;
+        crosshairRoot.style.top = 0;
+        crosshairRoot.style.bottom = 0;
+
+        crosshairRoot.style.justifyContent = Justify.Center;
+        crosshairRoot.style.alignItems = Align.Center;
+
+        root.Add(crosshairRoot);
+
+        crosshairLabel = new Label(idleCrosshairGlyph);
+        crosshairLabel.pickingMode = PickingMode.Ignore;
+
+        // True center alignment (no background box)
+        crosshairLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        crosshairLabel.style.whiteSpace = WhiteSpace.Normal;
+        crosshairLabel.style.color = Color.white;
+        crosshairLabel.style.backgroundColor = Color.clear;
+        crosshairLabel.style.fontSize = crosshairFontSize;
+
+        crosshairRoot.Add(crosshairLabel);
+    }
+
 
     private void BuildHotbarHud()
     {
         // Outer container spans the screen width and centers its child.
-        var hotbarAnchor = new VisualElement();
+        hotbarAnchor = new VisualElement();
         hotbarAnchor.style.position = Position.Absolute;
         hotbarAnchor.style.left = 0;
         hotbarAnchor.style.right = 0;
         hotbarAnchor.style.bottom = 18;
-        hotbarAnchor.style.height = slotSize.y + 2; // just enough height
         hotbarAnchor.style.justifyContent = Justify.Center;
         hotbarAnchor.style.alignItems = Align.Center;
 
         root.Add(hotbarAnchor);
+
+        // A padded panel around the hotbar that counts as "safe drop area"
+        hotbarPanel = new VisualElement();
+        hotbarPanel.AddToClassList("hotbar-panel");
+        hotbarPanel.style.flexDirection = FlexDirection.Row;
+        hotbarPanel.style.justifyContent = Justify.Center;
+        hotbarPanel.style.alignItems = Align.Center;
+
+        // "buffer" around the slots so dropping there does nothing
+        hotbarPanel.style.paddingLeft = 10;
+        hotbarPanel.style.paddingRight = 10;
+        hotbarPanel.style.paddingTop = 10;
+        hotbarPanel.style.paddingBottom = 10;
+
+        // optional subtle background (you can remove if you want it invisible)
+        hotbarPanel.style.backgroundColor = new Color(0, 0, 0, 0.0f);
+
+        hotbarAnchor.Add(hotbarPanel);
 
         // Inner container is the actual hotbar row with a fixed width.
         hotbarHud = new VisualElement();
@@ -128,25 +261,42 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         var model = playerInventory.Model;
         int hotbarCount = model.Hotbar.SlotCount;
-        
-        // Fixed width: slots + gaps (no trailing gap)
+
         hotbarHud.style.width = hotbarCount * slotSize.x + (hotbarCount - 1) * slotSpacing;
 
-        hotbarAnchor.Add(hotbarHud);
+        hotbarPanel.Add(hotbarHud);
 
         hotbarViews = new SlotView[hotbarCount];
         for (int i = 0; i < hotbarCount; i++)
         {
             bool isLastInRow = (i == hotbarCount - 1);
-            var v = CreateSlotView(model.Hotbar, i, allowClicks: false, isLastInRow: isLastInRow);
+
+            // IMPORTANT: allowClicks true so hotbar accepts drops while inventory is open
+            var v = CreateSlotView(model.Hotbar, i, allowClicks: true, isLastInRow: isLastInRow);
+
             hotbarViews[i] = v;
             hotbarHud.Add(v.Root);
         }
     }
 
+    private static bool IsInsideHotbarPanel(VisualElement ve)
+    {
+        while (ve != null)
+        {
+            if (ve.ClassListContains("hotbar-panel"))
+                return true;
+            ve = ve.parent;
+        }
+        return false;
+    }
+
+
 
     private void BuildBackpackOverlay()
     {
+        var model = playerInventory.Model;
+        if (model == null || model.Backpack == null || model.Cursor == null) return;
+
         backpackOverlay = new VisualElement();
         backpackOverlay.style.position = Position.Absolute;
         backpackOverlay.style.left = 0;
@@ -175,32 +325,34 @@ public sealed class InventoryUITKView : MonoBehaviour
         backpackGrid.style.flexDirection = FlexDirection.Row;
         backpackGrid.style.flexWrap = Wrap.Wrap;
 
-        float gridWidth = backpackColumns * (slotSize.x + slotSpacing);
+        float gridWidth = backpackColumns * slotSize.x + (backpackColumns - 1) * slotSpacing;
         backpackGrid.style.width = gridWidth;
         panel.Add(backpackGrid);
 
-        var model = playerInventory.Model;
+        int count = model.Backpack.SlotCount;
+        backpackViews = new SlotView[count];
 
-        backpackViews = new SlotView[model.Backpack.SlotCount];
-        for (int i = 0; i < model.Backpack.SlotCount; i++)
+        for (int i = 0; i < count; i++)
         {
-            var v = CreateSlotView(model.Backpack, i, allowClicks: true);
+            bool isLastInRow = ((i + 1) % backpackColumns) == 0;
+            bool isLastSlot = i == count - 1;
+
+            var v = CreateSlotView(model.Backpack, i, allowClicks: true, isLastInRow: (isLastInRow || isLastSlot));
             backpackViews[i] = v;
             backpackGrid.Add(v.Root);
         }
 
-        // Drop-to-world only when backpack is open and releasing outside slots
         backpackOverlay.RegisterCallback<PointerUpEvent>(OnOverlayPointerUp, TrickleDown.TrickleDown);
         panel.RegisterCallback<PointerUpEvent>(OnPanelPointerUp, TrickleDown.TrickleDown);
     }
+
     private void OnPanelPointerUp(PointerUpEvent evt)
     {
         if (!backpackOpen) return;
-        if (playerInventory == null) return;
+        if (playerInventory == null || playerInventory.Model == null) return;
         if (!playerInventory.Model.Cursor.HasItem) return;
 
-        // Releasing inside the gray panel (including gaps) should NOT drop.
-        // Do nothing; item stays on cursor.
+        // inside the gray panel => never drop
         evt.StopPropagation();
     }
 
@@ -291,7 +443,6 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         var view = new SlotView(container, index, slot, icon, qty);
 
-        // Hover highlight only meaningful while backpack is open (but harmless for hotbar)
         slot.RegisterCallback<PointerEnterEvent>(_ => slot.style.backgroundColor = new Color(0.22f, 0.22f, 0.22f, 1f));
         slot.RegisterCallback<PointerLeaveEvent>(_ => slot.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.9f));
 
@@ -303,8 +454,9 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private void OnSlotPointerDown(PointerDownEvent evt, SlotView view)
     {
+        Debug.Log($"Hotbar/Slot pointer down: {view.Container} idx {view.Index} btn {evt.button}");
         if (!backpackOpen) return;
-        if (playerInventory == null) return;
+        if (playerInventory == null || playerInventory.Model == null) return;
 
         bool changed = false;
 
@@ -323,41 +475,58 @@ public sealed class InventoryUITKView : MonoBehaviour
     private void OnOverlayPointerUp(PointerUpEvent evt)
     {
         if (!backpackOpen) return;
-        if (playerInventory == null) return;
+        if (playerInventory == null || playerInventory.Model == null) return;
         if (!playerInventory.Model.Cursor.HasItem) return;
 
+        // IMPORTANT: evt.target will often be the overlay (because of trickle-down).
+        // We need the element actually under the pointer.
+        var picked = root?.panel?.Pick(evt.position) as VisualElement;
+
         // If pointer-up happened on a slot (or a child), don't drop.
-        if (IsInsideInventorySlot(evt.target as VisualElement))
+        if (IsInsideInventorySlot(picked))
             return;
 
-        // If pointer-up happened inside the gray panel (including gaps), don't drop.
-        if (IsInsideInventoryPanel(evt.target as VisualElement))
+        // If pointer-up happened inside the gray inventory panel (including gaps), don't drop.
+        if (IsInsideInventoryPanel(picked))
             return;
 
-        // Otherwise: released outside the panel -> drop to world.
+        // If pointer-up happened inside the hotbar safe area, don't drop.
+        if (IsInsideHotbarPanel(picked))
+            return;
+
+        // Otherwise: released outside -> drop to world.
+
         ItemStack dropped = InventoryRules.DropCursorToWorld(playerInventory.Model.Cursor);
-        Debug.Log($"Dropped to world: {(dropped.IsEmpty ? "(empty)" : dropped.Item.ItemId + " x" + dropped.Quantity)}");
+
+        var spawner = FindFirstObjectByType<WorldItemSpawner>();
+        if (spawner != null)
+        {
+            spawner.SpawnAtFeet(dropped, playerInventory.transform);
+        }
+        else
+        {
+            Debug.LogWarning("No WorldItemSpawner found in scene.");
+        }
 
         playerInventory.NotifyInventoryChanged();
+
     }
+
     private static bool IsInsideInventoryPanel(VisualElement ve)
     {
         while (ve != null)
         {
-            if (ve.ClassListContains("inv-panel"))
-                return true;
+            if (ve.ClassListContains("inv-panel")) return true;
             ve = ve.parent;
         }
         return false;
     }
 
-
     private static bool IsInsideInventorySlot(VisualElement ve)
     {
         while (ve != null)
         {
-            if (ve.ClassListContains("inv-slot"))
-                return true;
+            if (ve.ClassListContains("inv-slot")) return true;
             ve = ve.parent;
         }
         return false;
@@ -365,18 +534,18 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private void RefreshAll()
     {
-        if (playerInventory == null) return;
+        if (!built) return;
+        if (playerInventory == null || playerInventory.Model == null) return;
 
-        // Hotbar
-        for (int i = 0; i < hotbarViews.Length; i++)
-            RefreshSlot(hotbarViews[i]);
+        if (hotbarViews != null)
+            for (int i = 0; i < hotbarViews.Length; i++)
+                if (hotbarViews[i].IsValid)
+                    RefreshSlot(hotbarViews[i]);
 
-        // Backpack (only if built)
         if (backpackViews != null)
-        {
             for (int i = 0; i < backpackViews.Length; i++)
-                RefreshSlot(backpackViews[i]);
-        }
+                if (backpackViews[i].IsValid)
+                    RefreshSlot(backpackViews[i]);
 
         RefreshHotbarSelection();
         UpdateCursorVisual(force: true);
@@ -400,13 +569,15 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private void RefreshHotbarSelection()
     {
+        if (!built) return;
         if (playerInventory == null || hotbarViews == null) return;
 
         int selected = playerInventory.SelectedHotbarIndex;
 
         for (int i = 0; i < hotbarViews.Length; i++)
         {
-            // highlight selected by changing border color
+            if (!hotbarViews[i].IsValid) continue;
+
             Color c = (i == selected) ? new Color(1f, 0.9f, 0.2f, 1f) : new Color(0, 0, 0, 0.75f);
 
             hotbarViews[i].Root.style.borderTopColor = c;
@@ -418,10 +589,12 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private void UpdateCursorVisual(bool force = false)
     {
+        if (!built || cursorRoot == null) return;
+
         var cursorContainer = cursorRoot.Q<VisualElement>("CursorContainer");
         if (cursorContainer == null) return;
 
-        if (!backpackOpen || playerInventory == null)
+        if (!backpackOpen || playerInventory == null || playerInventory.Model == null)
         {
             cursorContainer.style.display = DisplayStyle.None;
             return;
@@ -456,6 +629,8 @@ public sealed class InventoryUITKView : MonoBehaviour
         public readonly VisualElement Root;
         public readonly Image Icon;
         public readonly Label Qty;
+
+        public bool IsValid => Container != null && Root != null && Icon != null && Qty != null;
 
         public SlotView(IItemContainer container, int index, VisualElement root, Image icon, Label qty)
         {
