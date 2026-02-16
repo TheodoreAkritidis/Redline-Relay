@@ -204,6 +204,47 @@ public class SimpleFpsController : MonoBehaviour
         if (devConsole != null && devConsole.IsOpen) return; // block tab while console open
         SetInventoryOpen(!inventoryOpen);
     }
+    private void StepHotbar(int delta)
+    {
+        if (playerInventory == null || playerInventory.Model == null || playerInventory.Model.Hotbar == null)
+            return;
+
+        int count = playerInventory.Model.Hotbar.SlotCount;
+        if (count <= 0) return;
+
+        int cur = playerInventory.SelectedHotbarIndex;
+        int next = (cur + delta) % count;
+        if (next < 0) next += count;
+
+        playerInventory.SetSelectedHotbarIndex(next);
+    }
+
+
+    public void OnHotbarNext(InputValue v)
+    {
+        if (!v.isPressed) return;
+        if (inventoryOpen) return;
+        StepHotbar(+1);
+    }
+
+    public void OnHotbarPrev(InputValue v)
+    {
+        if (!v.isPressed) return;
+        if (inventoryOpen) return;
+        StepHotbar(-1);
+    }
+
+    // Mouse scroll is a Vector2 (x,y). We care about y.
+    public void OnHotbarScroll(InputValue v)
+    {
+        if (inventoryOpen) return;
+
+        Vector2 scroll = v.Get<Vector2>();
+        if (Mathf.Abs(scroll.y) < 0.01f) return;
+
+        // Typical FPS convention: wheel up -> previous slot, wheel down -> next slot
+        StepHotbar(scroll.y > 0f ? -1 : +1);
+    }
 
 
 
