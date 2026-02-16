@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Log
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   ItemId: log
-  Icon: {fileID: 21300000, guid: bf8c8c9c088511f418307ecd58e2f2af, type: 3}
   MaxStack: 20
+  Icon: {fileID: 21300000, guid: bf8c8c9c088511f418307ecd58e2f2af, type: 3}
+  WorldPrefab: {fileID: 5642910366407083158, guid: 01e1d4efb9236e44bb73446e75957260, type: 3}

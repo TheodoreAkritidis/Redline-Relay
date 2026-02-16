@@ -31,6 +31,11 @@ public class SimpleFpsController : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool showSpeedDebug = true;
 
+    [Header("HUD")]
+    [SerializeField] private CrosshairUITK crosshairUI;     // assign HUD object
+    [SerializeField] private Interactor interactor;   // assign (optional but recommended)
+
+
     private GUIStyle speedStyle;
     private Rigidbody rb;
 
@@ -48,6 +53,9 @@ public class SimpleFpsController : MonoBehaviour
 
     private void Awake()
     {
+        if (crosshairUI == null) crosshairUI = FindFirstObjectByType<CrosshairUITK>();
+        if (interactor == null) interactor = GetComponent<Interactor>();
+
         rb = GetComponent<Rigidbody>();
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.constraints |= RigidbodyConstraints.FreezeRotation;
@@ -134,7 +142,13 @@ public class SimpleFpsController : MonoBehaviour
     private void SetInventoryOpen(bool open)
     {
         inventoryOpen = open;
+        // Hide HUD crosshair while inventory is open
+        if (crosshairUI != null)
+            crosshairUI.SetVisible(!open);
 
+        // Prevent interaction raycast / E while inventory open
+        if (interactor != null)
+            interactor.enabled = !open;
         if (inventoryOpen)
         {
             moveInput = Vector2.zero;
@@ -190,6 +204,8 @@ public class SimpleFpsController : MonoBehaviour
         if (devConsole != null && devConsole.IsOpen) return; // block tab while console open
         SetInventoryOpen(!inventoryOpen);
     }
+
+
 
     // Hotbar selection (bind these to 1..0 in Input Actions)
     public void OnHotbar1(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(0); }
