@@ -48,8 +48,10 @@ public class SimpleFpsController : MonoBehaviour
     private float yaw;
 
     private bool inventoryOpen;
+    private bool craftingOpen;
 
-    private bool UiBlocked => inventoryOpen || (devConsole != null && devConsole.IsOpen);
+
+    private bool UiBlocked => inventoryOpen || craftingOpen || (devConsole != null && devConsole.IsOpen);
 
     private void Awake()
     {
@@ -172,6 +174,52 @@ public class SimpleFpsController : MonoBehaviour
         if (inventoryUI != null)
             inventoryUI.SetBackpackOpen(inventoryOpen);
     }
+    private void SetCraftingOpen(bool open)
+    {
+        craftingOpen = open;
+
+        // Hide HUD crosshair while any UI is open
+        if (crosshairUI != null)
+            crosshairUI.SetVisible(!(inventoryOpen || craftingOpen));
+
+        // Prevent interaction while UI open
+        if (interactor != null)
+            interactor.enabled = !(inventoryOpen || craftingOpen);
+
+        if (inventoryOpen || craftingOpen)
+        {
+            moveInput = Vector2.zero;
+            lookDelta = Vector2.zero;
+            sprintHeld = false;
+            jumpQueued = false;
+
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            if (devConsole == null || !devConsole.IsOpen)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+
+        if (inventoryUI != null)
+            inventoryUI.SetCraftingOpen(craftingOpen);
+    }
+
+    public void OnCrafting(InputValue value)
+    {
+        if (!value.isPressed) return;
+        if (devConsole != null && devConsole.IsOpen) return;
+
+        // If inventory is open, close it first (optional)
+        if (inventoryOpen) SetInventoryOpen(false);
+
+        SetCraftingOpen(!craftingOpen);
+    }
+
 
     // --- Input System (PlayerInput: Send Messages) ---
     public void OnMove(InputValue value)
@@ -202,6 +250,7 @@ public class SimpleFpsController : MonoBehaviour
     {
         if (!value.isPressed) return;
         if (devConsole != null && devConsole.IsOpen) return; // block tab while console open
+        if (craftingOpen) return;
         SetInventoryOpen(!inventoryOpen);
     }
 

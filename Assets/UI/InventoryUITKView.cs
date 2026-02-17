@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using static UnityEngine.EventSystems.EventTrigger;
 
 [RequireComponent(typeof(UIDocument))]
 public sealed class InventoryUITKView : MonoBehaviour
@@ -21,6 +22,43 @@ public sealed class InventoryUITKView : MonoBehaviour
     [SerializeField] private int crosshairFontSize = 26;
     [SerializeField] private int promptFontSize = 18;
 
+    [Header("Crafting")]
+    [SerializeField] private CraftingRecipeDatabase craftingDb;
+
+    private struct RecipeStub
+    {
+        public string Name;
+        public Texture2D Icon;        // UI Toolkit Image uses Texture2D
+        public string[] Materials;    // up to 4 strings
+    }
+
+
+    private bool IsAnyMenuOpen => backpackOpen || craftingOpen;
+
+    // Crafting overlay
+    private bool craftingOpen;
+    private VisualElement craftingOverlay;
+    private VisualElement craftingInventoryGrid; // left grid container (5x6)
+    private ScrollView recipeScroll;
+    private VisualElement recipeList;
+
+    // Crafting UI - middle panel bits
+    private Image craftPreviewIcon;
+    private Label craftRecipeNameLabel;
+    private Label[] craftMaterialLabels; // size 4
+
+    // Temporary recipe data
+    //private RecipeStub[] recipeStubs;
+    //private RecipeStub selectedRecipe;
+    private CraftingRecipe selectedRecipe;
+    private Button craftButton;
+
+
+    // optional: selected recipe highlight
+    private VisualElement selectedRecipeEntry;
+    public bool IsCraftingOpen => craftingOpen;
+
+
     private VisualElement hotbarAnchor;
     private VisualElement hotbarPanel;
 
@@ -30,6 +68,10 @@ public sealed class InventoryUITKView : MonoBehaviour
     private bool triedBuildThisFrame;
 
     private VisualElement root;
+    // Crafting overlay
+    private SlotView[] craftingViews;
+
+
 
     // Always-visible hotbar HUD
     private VisualElement hotbarHud;
@@ -69,6 +111,7 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private void Awake()
     {
+        if (craftingDb == null) craftingDb = FindFirstObjectByType<CraftingRecipeDatabase>();
         if (uiDocument == null) uiDocument = GetComponent<UIDocument>();
         if (playerInventory == null) playerInventory = FindFirstObjectByType<PlayerInventoryComponent>();
     }
@@ -101,7 +144,7 @@ public sealed class InventoryUITKView : MonoBehaviour
             return;
         }
 
-        if (!backpackOpen) return;
+        if (!IsAnyMenuOpen) return;
         UpdateCursorVisual();
     }
 
@@ -182,15 +225,346 @@ public sealed class InventoryUITKView : MonoBehaviour
         
         BuildBackpackOverlay();
         BuildHotbarHud();
+        BuildCraftingOverlay();
         BuildCursorVisual();
         BuildCrosshairHud();  
 
         if (backpackOverlay != null)
             backpackOverlay.style.display = backpackOpen ? DisplayStyle.Flex : DisplayStyle.None;
+        if (craftingOverlay != null)
+            craftingOverlay.style.display = craftingOpen ? DisplayStyle.Flex : DisplayStyle.None;
 
         SetCrosshairVisible(!backpackOpen);
         SetCrosshairDefault();
     }
+
+
+    private void BuildCraftingOverlay()
+    {
+        var model = playerInventory?.Model;
+        if (model == null) return;
+
+        // Full-screen dark overlay
+        craftingOverlay = new VisualElement();
+        craftingOverlay.style.position = Position.Absolute;
+        craftingOverlay.style.left = 0;
+        craftingOverlay.style.top = 0;
+        craftingOverlay.style.right = 0;
+        craftingOverlay.style.bottom = 0;
+        craftingOverlay.style.backgroundColor = new Color(0, 0, 0, 0.55f);
+        craftingOverlay.style.justifyContent = Justify.Center;
+        craftingOverlay.style.alignItems = Align.Center;
+
+        root.Add(craftingOverlay);
+        craftingOverlay.RegisterCallback<PointerUpEvent>(OnOverlayPointerUp, TrickleDown.TrickleDown);
+
+        // Center row that holds the three panels
+        var row = new VisualElement();
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.justifyContent = Justify.Center;
+        row.style.alignItems = Align.Center;
+        craftingOverlay.Add(row);
+
+        // -------- LEFT PANEL (5x6 grid) --------
+        var leftPanel = MakePanel();
+        leftPanel.style.marginRight = 18; // replaces row gap
+        leftPanel.RegisterCallback<PointerUpEvent>(OnPanelPointerUp, TrickleDown.TrickleDown);
+        row.Add(leftPanel);
+
+        craftingInventoryGrid = new VisualElement();
+        craftingInventoryGrid.style.flexDirection = FlexDirection.Row;
+        craftingInventoryGrid.style.flexWrap = Wrap.Wrap;
+
+        int craftCols = 5;
+        int craftRows = 6;
+
+        float gridWidth = craftCols * slotSize.x + (craftCols - 1) * slotSpacing;
+        craftingInventoryGrid.style.width = gridWidth;
+
+        leftPanel.Add(craftingInventoryGrid);
+
+        // Inventory slots
+        int slotsToShow = Mathf.Min(craftCols * craftRows, model.Backpack.SlotCount);
+        craftingViews = new SlotView[slotsToShow];
+
+        for (int i = 0; i < slotsToShow; i++)
+        {
+            bool isLastInRow = ((i + 1) % craftCols) == 0;
+            var v = CreateSlotView(model.Backpack, i, allowClicks: true, isLastInRow: isLastInRow);
+
+            craftingViews[i] = v;
+            craftingInventoryGrid.Add(v.Root);
+        }
+
+
+        // -------- MIDDLE PANEL (preview + name + materials + button) --------
+        var midPanel = MakePanel();
+        midPanel.style.width = 260;
+        midPanel.style.alignItems = Align.Center;
+        midPanel.style.marginRight = 18;
+        midPanel.RegisterCallback<PointerUpEvent>(OnPanelPointerUp, TrickleDown.TrickleDown);
+        row.Add(midPanel);
+
+        // Preview box
+        var previewBox = new VisualElement();
+        previewBox.style.width = 120;
+        previewBox.style.height = 120;
+        previewBox.style.backgroundColor = new Color(0.18f, 0.18f, 0.18f, 1f);
+        previewBox.style.borderTopWidth = 2;
+        previewBox.style.borderRightWidth = 2;
+        previewBox.style.borderBottomWidth = 2;
+        previewBox.style.borderLeftWidth = 2;
+        SetBorder(previewBox, new Color(0, 0, 0, 0.75f));
+        midPanel.Add(previewBox);
+
+        // Icon inside preview box
+        craftPreviewIcon = new Image();
+        craftPreviewIcon.style.width = Length.Percent(100);
+        craftPreviewIcon.style.height = Length.Percent(100);
+        craftPreviewIcon.scaleMode = ScaleMode.ScaleToFit;
+        previewBox.Add(craftPreviewIcon);
+
+        // Recipe name label
+        craftRecipeNameLabel = new Label("Select a recipe");
+        craftRecipeNameLabel.style.marginTop = 10;
+        craftRecipeNameLabel.style.unityTextAlign = TextAnchor.UpperCenter;
+        craftRecipeNameLabel.style.color = Color.white;
+        midPanel.Add(craftRecipeNameLabel);
+
+        // Materials list (up to 4)
+        var matsContainer = new VisualElement();
+        matsContainer.style.marginTop = 8;
+        matsContainer.style.alignSelf = Align.Stretch;
+        midPanel.Add(matsContainer);
+
+        craftMaterialLabels = new Label[4];
+        for (int i = 0; i < craftMaterialLabels.Length; i++)
+        {
+            var l = new Label("");
+            l.style.color = new Color(0.9f, 0.9f, 0.9f, 1f);
+            l.style.unityTextAlign = TextAnchor.UpperLeft;
+            l.style.marginTop = 2;
+            matsContainer.Add(l);
+            craftMaterialLabels[i] = l;
+        }
+
+        craftButton = new Button(OnCraftPressed);
+        craftButton.text = "Craft";
+        craftButton.style.marginTop = 14;
+        craftButton.style.width = 160;
+        craftButton.SetEnabled(false);
+        midPanel.Add(craftButton);
+
+
+
+        // -------- RIGHT PANEL (scrollable recipe list) --------
+        var rightPanel = MakePanel();
+        rightPanel.style.width = 320;
+        rightPanel.style.height = 360;
+        rightPanel.RegisterCallback<PointerUpEvent>(OnPanelPointerUp, TrickleDown.TrickleDown);
+        row.Add(rightPanel);
+
+        recipeScroll = new ScrollView(ScrollViewMode.Vertical);
+        recipeScroll.style.flexGrow = 1;
+        rightPanel.Add(recipeScroll);
+
+        recipeList = new VisualElement();
+        recipeList.style.flexDirection = FlexDirection.Column;
+        recipeScroll.Add(recipeList);
+
+        recipeList.Clear();
+
+        if (craftingDb == null || craftingDb.Recipes == null)
+        {
+            Debug.LogWarning("CraftingRecipeDatabase not set (craftingDb) or Recipes is null.");
+        }
+        else
+        {
+            foreach (var r in craftingDb.Recipes)
+            {
+                if (r != null)
+                    recipeList.Add(MakeRecipeEntry(r));
+            }
+        }
+
+        // Default hidden unless already open
+        craftingOverlay.style.display = craftingOpen ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+    private void OnCraftPressed()
+    {
+        if (playerInventory == null || playerInventory.Model == null) return;
+        if (selectedRecipe == null) return;
+
+        // Must have no cursor item (optional rule, but recommended)
+        if (playerInventory.Model.Cursor.HasItem) return;
+
+        // Check + consume ingredients from hotbar+backpack (so crafting works no matter where mats are)
+        var hotbar = playerInventory.Model.Hotbar;
+        var backpack = playerInventory.Model.Backpack;
+
+        foreach (var ing in selectedRecipe.Ingredients)
+        {
+            if (ing.Item == null || ing.Amount <= 0) continue;
+            int have = InventoryRules.CountItem(hotbar, backpack, ing.Item);
+            if (have < ing.Amount) return; // not enough
+        }
+
+        foreach (var ing in selectedRecipe.Ingredients)
+        {
+            if (ing.Item == null || ing.Amount <= 0) continue;
+            InventoryRules.TryConsume(hotbar, backpack, ing.Item, ing.Amount);
+        }
+
+        // Add output (auto-add uses hotbar first then backpack, new stacks in backpack)
+        var outItem = selectedRecipe.OutputItem;
+        int outAmt = Mathf.Max(1, selectedRecipe.OutputAmount);
+        int rem = InventoryRules.TryAutoAdd(outItem, outAmt, hotbar, backpack);
+
+        // If rem > 0, you can decide what to do (drop it to world, etc). For now ignore.
+        playerInventory.NotifyInventoryChanged();
+
+        // Refresh requirement text + button enabled state
+        RefreshSelectedRecipeUI();
+    }
+    private VisualElement MakePanel()
+    {
+        var panel = new VisualElement();
+        panel.AddToClassList("inv-panel"); 
+        panel.style.backgroundColor = new Color(0.12f, 0.12f, 0.12f, 0.95f);
+        panel.style.paddingLeft = 16;
+        panel.style.paddingRight = 16;
+        panel.style.paddingTop = 16;
+        panel.style.paddingBottom = 16;
+        panel.style.borderTopLeftRadius = 10;
+        panel.style.borderTopRightRadius = 10;
+        panel.style.borderBottomLeftRadius = 10;
+        panel.style.borderBottomRightRadius = 10;
+        return panel;
+    }
+
+    private VisualElement MakeRecipeEntry(CraftingRecipe recipe)
+    {
+        var entry = new VisualElement();
+        entry.style.flexDirection = FlexDirection.Row;
+        entry.style.alignItems = Align.Center;
+        entry.style.height = 64;
+        entry.style.marginBottom = 10;
+
+        entry.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.9f);
+        entry.style.borderTopWidth = 2;
+        entry.style.borderRightWidth = 2;
+        entry.style.borderBottomWidth = 2;
+        entry.style.borderLeftWidth = 2;
+        SetBorder(entry, new Color(0, 0, 0, 0.75f));
+
+        var icon = new Image();
+        icon.scaleMode = ScaleMode.ScaleToFit;
+        icon.style.width = 48;
+        icon.style.height = 48;
+        icon.style.marginLeft = 8;
+        icon.image = recipe != null && recipe.OutputItem != null && recipe.OutputItem.Icon != null
+            ? recipe.OutputItem.Icon.texture
+            : null;
+        entry.Add(icon);
+
+        var label = new Label(recipe != null ? recipe.DisplayName : "Recipe");
+        label.style.color = Color.white;
+        label.style.unityTextAlign = TextAnchor.MiddleLeft;
+        label.style.marginLeft = 10;
+        entry.Add(label);
+
+        entry.RegisterCallback<PointerDownEvent>(_ =>
+        {
+            if (selectedRecipeEntry != null)
+                SetBorder(selectedRecipeEntry, new Color(0, 0, 0, 0.75f));
+
+            selectedRecipeEntry = entry;
+            SetBorder(entry, new Color(1f, 0.9f, 0.2f, 1f));
+
+            selectedRecipe = recipe;
+            RefreshSelectedRecipeUI();
+        });
+
+        return entry;
+    }
+    private void RefreshSelectedRecipeUI()
+    {
+        if (craftRecipeNameLabel == null || craftPreviewIcon == null || craftMaterialLabels == null) return;
+
+        if (selectedRecipe == null)
+        {
+            craftRecipeNameLabel.text = "Select a recipe";
+            craftPreviewIcon.image = null;
+            for (int i = 0; i < craftMaterialLabels.Length; i++) craftMaterialLabels[i].text = "";
+            craftButton?.SetEnabled(false);
+            return;
+        }
+
+        craftRecipeNameLabel.text = string.IsNullOrWhiteSpace(selectedRecipe.DisplayName)
+            ? selectedRecipe.name
+            : selectedRecipe.DisplayName;
+
+        craftPreviewIcon.image =
+            selectedRecipe.OutputItem != null && selectedRecipe.OutputItem.Icon != null
+                ? selectedRecipe.OutputItem.Icon.texture
+                : null;
+
+        var hotbar = playerInventory.Model.Hotbar;
+        var backpack = playerInventory.Model.Backpack;
+
+        bool canCraft = true;
+
+        for (int i = 0; i < craftMaterialLabels.Length; i++)
+        {
+            if (selectedRecipe.Ingredients == null || i >= selectedRecipe.Ingredients.Length)
+            {
+                craftMaterialLabels[i].text = "";
+                continue;
+            }
+
+            var ing = selectedRecipe.Ingredients[i];
+            if (ing.Item == null || ing.Amount <= 0)
+            {
+                craftMaterialLabels[i].text = "";
+                continue;
+            }
+
+            int have = InventoryRules.CountItem(hotbar, backpack, ing.Item);
+            int need = ing.Amount;
+
+            craftMaterialLabels[i].text = $"{ing.Item.ItemId} {have}/{need}";
+            if (have < need) canCraft = false;
+        }
+
+        craftButton?.SetEnabled(canCraft);
+    }
+    private static void SetBorder(VisualElement ve, Color c)
+    {
+        ve.style.borderTopColor = c;
+        ve.style.borderRightColor = c;
+        ve.style.borderBottomColor = c;
+        ve.style.borderLeftColor = c;
+    }
+
+
+    public void SetCraftingOpen(bool open)
+    {
+        craftingOpen = open;
+        if (!built) return;
+
+        if (craftingOverlay != null)
+            craftingOverlay.style.display = craftingOpen ? DisplayStyle.Flex : DisplayStyle.None;
+
+        // Hide crosshair whenever ANY UI is open
+        SetCrosshairVisible(!(backpackOpen || craftingOpen));
+
+        // If closing crafting, return cursor item like inventory does
+        if (!craftingOpen && playerInventory != null && playerInventory.Model != null)
+            InventoryRules.CancelCursorToOrigin(playerInventory.Model.Cursor);
+
+        RefreshAll();
+    }
+
 
     private void BuildCrosshairHud()
     {
@@ -348,7 +722,7 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private void OnPanelPointerUp(PointerUpEvent evt)
     {
-        if (!backpackOpen) return;
+        if (!IsAnyMenuOpen) return;
         if (playerInventory == null || playerInventory.Model == null) return;
         if (!playerInventory.Model.Cursor.HasItem) return;
 
@@ -455,7 +829,7 @@ public sealed class InventoryUITKView : MonoBehaviour
     private void OnSlotPointerDown(PointerDownEvent evt, SlotView view)
     {
         Debug.Log($"Hotbar/Slot pointer down: {view.Container} idx {view.Index} btn {evt.button}");
-        if (!backpackOpen) return;
+        if (!IsAnyMenuOpen) return;
         if (playerInventory == null || playerInventory.Model == null) return;
 
         bool changed = false;
@@ -474,7 +848,7 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private void OnOverlayPointerUp(PointerUpEvent evt)
     {
-        if (!backpackOpen) return;
+        if (!IsAnyMenuOpen) return;
         if (playerInventory == null || playerInventory.Model == null) return;
         if (!playerInventory.Model.Cursor.HasItem) return;
 
@@ -534,6 +908,7 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private void RefreshAll()
     {
+        RefreshSelectedRecipeUI();
         if (!built) return;
         if (playerInventory == null || playerInventory.Model == null) return;
 
@@ -546,6 +921,12 @@ public sealed class InventoryUITKView : MonoBehaviour
             for (int i = 0; i < backpackViews.Length; i++)
                 if (backpackViews[i].IsValid)
                     RefreshSlot(backpackViews[i]);
+
+        if (craftingViews != null)
+            for (int i = 0; i < craftingViews.Length; i++)
+                if (craftingViews[i].IsValid)
+                    RefreshSlot(craftingViews[i]);
+
 
         RefreshHotbarSelection();
         UpdateCursorVisual(force: true);
@@ -594,8 +975,8 @@ public sealed class InventoryUITKView : MonoBehaviour
         var cursorContainer = cursorRoot.Q<VisualElement>("CursorContainer");
         if (cursorContainer == null) return;
 
-        if (!backpackOpen || playerInventory == null || playerInventory.Model == null)
-        {
+        if(!IsAnyMenuOpen || playerInventory == null || playerInventory.Model == null)
+{
             cursorContainer.style.display = DisplayStyle.None;
             return;
         }
