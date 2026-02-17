@@ -277,5 +277,58 @@ public static class InventoryRules
         return -1;
     }
 
+    public static int CountItem(IItemContainer a, IItemContainer b, ItemDefinition item)
+    {
+        if (item == null) return 0;
+        int total = 0;
+
+        if (a != null)
+            for (int i = 0; i < a.SlotCount; i++)
+            {
+                var s = a.GetSlot(i);
+                if (!s.IsEmpty && s.Item == item) total += s.Quantity;
+            }
+
+        if (b != null)
+            for (int i = 0; i < b.SlotCount; i++)
+            {
+                var s = b.GetSlot(i);
+                if (!s.IsEmpty && s.Item == item) total += s.Quantity;
+            }
+
+        return total;
+    }
+
+    public static bool TryConsume(IItemContainer a, IItemContainer b, ItemDefinition item, int amount)
+    {
+        if (item == null || amount <= 0) return false;
+
+        int have = CountItem(a, b, item);
+        if (have < amount) return false;
+
+        amount = ConsumeFromContainer(a, item, amount);
+        amount = ConsumeFromContainer(b, item, amount);
+        return amount <= 0;
+    }
+
+    private static int ConsumeFromContainer(IItemContainer c, ItemDefinition item, int amount)
+    {
+        if (c == null || amount <= 0) return amount;
+
+        for (int i = 0; i < c.SlotCount && amount > 0; i++)
+        {
+            var s = c.GetSlot(i);
+            if (s.IsEmpty || s.Item != item) continue;
+
+            int take = Mathf.Min(s.Quantity, amount);
+            s.Quantity -= take;
+            if (s.Quantity <= 0) s.Clear();
+            c.SetSlot(i, s);
+
+            amount -= take;
+        }
+
+        return amount;
+    }
 
 }

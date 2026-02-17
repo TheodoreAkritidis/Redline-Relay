@@ -157,6 +157,7 @@ MonoBehaviour:
   idleCrosshairGlyph: "\u29BF"
   crosshairFontSize: 26
   promptFontSize: 18
+  craftingDb: {fileID: 0}
 --- !u!114 &97276696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,6 +319,7 @@ GameObject:
   m_Component:
   - component: {fileID: 279136260}
   - component: {fileID: 279136259}
+  - component: {fileID: 279136261}
   m_Layer: 0
   m_Name: Debug
   m_TagString: Untagged
@@ -340,6 +342,7 @@ MonoBehaviour:
   items:
   - {fileID: 11400000, guid: 4af2de02b0ea31b4090ac8a5e0f4404b, type: 2}
   - {fileID: 11400000, guid: c52b483090d3bd1478bdcd8da66e8947, type: 2}
+  - {fileID: 11400000, guid: 3f0dc44ff817b684a8f8ec0d587b850a, type: 2}
 --- !u!4 &279136260
 Transform:
   m_ObjectHideFlags: 0
@@ -356,6 +359,20 @@ Transform:
   - {fileID: 1613928235}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &279136261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 279136258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 150ca3df8e6492f4782ba37ee78920ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipeDatabase
+  recipes:
+  - {fileID: 11400000, guid: 5e94f120faec41e428ae3836d1b38547, type: 2}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -664,78 +681,6 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &926994392
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 926994395}
-  - component: {fileID: 926994394}
-  - component: {fileID: 926994393}
-  m_Layer: 0
-  m_Name: HUDManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &926994393
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 926994392}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 850ebbcac669d424181e3fba6f70ef8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CrosshairUITKView
-  uiDocument: {fileID: 0}
-  defaultGlyph: .
-  crosshairFontSize: 28
-  promptFontSize: 18
---- !u!114 &926994394
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 926994392}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
-  m_PanelSettings: {fileID: 11400000, guid: 085ed5175d7bc9f478c038fddfc81c09, type: 2}
-  m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: 65af5105f209a4948ba344aa0c83911f, type: 3}
-  m_SortingOrder: 0
-  m_Position: 0
-  m_WorldSpaceSizeMode: 1
-  m_WorldSpaceWidth: 1920
-  m_WorldSpaceHeight: 1080
-  m_PivotReferenceSize: 0
-  m_Pivot: 0
-  m_WorldSpaceCollider: {fileID: 0}
---- !u!4 &926994395
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 926994392}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.67344, y: 0, z: 9.45891}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
