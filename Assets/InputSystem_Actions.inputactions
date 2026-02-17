@@ -190,10 +190,31 @@
                     "name": "Crafting",
                     "type": "Button",
                     "id": "5c5ca5de-5c21-486f-8ef8-bbfe8733ac37",
+                    "name": "HotbarNext",
+                    "type": "Button",
+                    "id": "91aa2a60-9198-4175-a889-4b543b7b4071",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "HotbarPrev",
+                    "type": "Button",
+                    "id": "65b2c7f7-e036-4fd7-9333-4b048a44cc49",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "HotbarScroll",
+                    "type": "Value",
+                    "id": "0f6ba6c0-3b86-4557-af8c-822a207f5e9e",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -711,6 +732,34 @@
                     "processors": "",
                     "groups": "",
                     "action": "Crafting",
+                    "id": "d0579ba0-89e8-4a6d-b0c2-b89e36285ea5",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "HotbarNext",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ec988fe7-663d-4b17-bd99-7c473bf70ebe",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "HotbarPrev",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "72022c90-b7e7-4319-a938-9f5a3158812b",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "HotbarScroll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
