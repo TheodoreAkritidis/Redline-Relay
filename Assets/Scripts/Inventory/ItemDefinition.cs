@@ -1,16 +1,12 @@
-// File: ItemDefinition.cs
-using System;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Survival/Items/Item Definition")]
+[CreateAssetMenu(menuName = "Items/Item Definition")]
 public sealed class ItemDefinition : ScriptableObject
 {
-    [Header("Identity")]
     public string ItemId;
-
-    [Header("UI")]
+    public int MaxStack = 1;
     public Sprite Icon;
 
-    [Header("Stacking")]
-    [Min(1)] public int MaxStack = 1;
+    [Header("World")]
+    public GameObject WorldPrefab; // <-- assign a mesh/model prefab for this item (log, rock, etc)
 }
