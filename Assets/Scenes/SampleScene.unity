@@ -1331,9 +1331,5 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1429382567}
-<<<<<<< origin/daynight_cycle
-  - {fileID: 1109902669}
-=======
   - {fileID: 97276697}
   - {fileID: 279136260}
->>>>>>> main
