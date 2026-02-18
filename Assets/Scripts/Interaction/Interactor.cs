@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,6 +10,10 @@ public sealed class Interactor : MonoBehaviour
     [SerializeField] private float interactRange = 3.0f;
     [SerializeField] private LayerMask interactMask = ~0;
 
+    [Header("terrain")]
+    [SerializeField] private TerrainHarvestPainter terrainHarvest;
+
+
     [Header("UI")]
     [SerializeField] private InventoryUITKView inventoryUI;
 
@@ -17,6 +22,8 @@ public sealed class Interactor : MonoBehaviour
 
     private void Awake()
     {
+        if (terrainHarvest == null) terrainHarvest = FindFirstObjectByType<TerrainHarvestPainter>();
+
         if (inventoryUI == null) inventoryUI = FindFirstObjectByType<InventoryUITKView>();
         if (cameraTransform == null)
         {
@@ -33,12 +40,11 @@ public sealed class Interactor : MonoBehaviour
 
     private void ResolveTarget()
     {
-
         current = null;
-        if (inventoryUI != null && inventoryUI.IsBackpackOpen)
+
+        if (inventoryUI != null && (inventoryUI.IsBackpackOpen || inventoryUI.IsCraftingOpen))
         {
             inventoryUI.SetCrosshairDefault();
-            current = null;
             return;
         }
 
@@ -49,36 +55,49 @@ public sealed class Interactor : MonoBehaviour
         }
 
         Ray r = new Ray(cameraTransform.position, cameraTransform.forward);
-        if (Physics.Raycast(r, out RaycastHit hit, interactRange, interactMask, QueryTriggerInteraction.Collide))
+
+        // 1) Find the nearest physics hit that actually has an IInteractable
+        var hits = Physics.RaycastAll(r, interactRange, interactMask, QueryTriggerInteraction.Collide);
+        if (hits != null && hits.Length > 0)
         {
-            var interactable = hit.collider.GetComponentInParent<IInteractable>();
-            if (interactable != null)
+            Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            for (int i = 0; i < hits.Length; i++)
+            {
+                var interactable = hits[i].collider.GetComponentInParent<IInteractable>();
+                if (interactable == null) continue;
+
                 current = interactable;
+                inventoryUI?.SetCrosshairPrompt(current.GetPrompt());
+                return;
+            }
         }
 
-        if (current == null)
+        // 2) Fallback: painted terrain trees/rocks via TerrainHarvestPainter
+        if (terrainHarvest != null)
         {
-            inventoryUI?.SetCrosshairDefault();
+            terrainHarvest.ResolveFromRay(r, interactRange);
+            if (terrainHarvest.HasTarget)
+            {
+                current = terrainHarvest;
+                inventoryUI?.SetCrosshairPrompt(current.GetPrompt());
+                return;
+            }
         }
-        else
-        {
-            inventoryUI?.SetCrosshairPrompt(current.GetPrompt());
-        }
+
+        inventoryUI?.SetCrosshairDefault();
     }
 
-    // PlayerInput (Send Messages): Action name must be "Interact" -> calls OnInteract
     public void OnInteract(InputValue v)
     {
-        Debug.Log("Interactor.OnInteract fired");
         if (!v.isPressed) return;
 
-        if (current == null)
-        {
-            Debug.Log("Interact pressed, but current is null.");
+        if (inventoryUI != null && (inventoryUI.IsBackpackOpen || inventoryUI.IsCraftingOpen))
             return;
-        }
 
-        Debug.Log($"Interacting with: {current}");
+        if (current == null) return;
+
         current.Interact(gameObject);
     }
+
 }

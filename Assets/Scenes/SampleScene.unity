@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!218 &15117165 stripped
+Terrain:
+  m_CorrespondingSourceObject: {fileID: 7558206655129227144, guid: 773a41863aa7b8746b701b6f733a496a, type: 3}
+  m_PrefabInstance: {fileID: 602345613}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &97276694
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,6 +1007,7 @@ GameObject:
   - component: {fileID: 1230745132}
   - component: {fileID: 1230745133}
   - component: {fileID: 1230745134}
+  - component: {fileID: 1230745135}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -1018,7 +1024,7 @@ Transform:
   m_GameObject: {fileID: 1230745122}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.52, z: 2.1}
+  m_LocalPosition: {x: 653.8, y: 1.69, z: 516.68}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1241,6 +1247,7 @@ MonoBehaviour:
   interactMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  terrainHarvest: {fileID: 0}
   inventoryUI: {fileID: 97276695}
 --- !u!114 &1230745133
 MonoBehaviour:
@@ -1273,6 +1280,47 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &1230745135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1230745122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d977ef253c7c2d4e9b71bac70ce3725, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TerrainHarvestPainter
+  terrain: {fileID: 15117165}
+  spawner: {fileID: 1230745134}
+  harvestRadiusMeters: 1.25
+  spawnUpOffset: 0.15
+  drops:
+  - PrototypeIndex: 0
+    DropItem: {fileID: 11400000, guid: c52b483090d3bd1478bdcd8da66e8947, type: 2}
+    DropAmount: 3
+    PromptNameOverride: 
+  - PrototypeIndex: 1
+    DropItem: {fileID: 11400000, guid: c52b483090d3bd1478bdcd8da66e8947, type: 2}
+    DropAmount: 1
+    PromptNameOverride: 
+  - PrototypeIndex: 2
+    DropItem: {fileID: 11400000, guid: c52b483090d3bd1478bdcd8da66e8947, type: 2}
+    DropAmount: 4
+    PromptNameOverride: 
+  - PrototypeIndex: 3
+    DropItem: {fileID: 11400000, guid: c52b483090d3bd1478bdcd8da66e8947, type: 2}
+    DropAmount: 4
+    PromptNameOverride: 
+  - PrototypeIndex: 6
+    DropItem: {fileID: 11400000, guid: 4af2de02b0ea31b4090ac8a5e0f4404b, type: 2}
+    DropAmount: 3
+    PromptNameOverride: 
+  - PrototypeIndex: 7
+    DropItem: {fileID: 11400000, guid: 4af2de02b0ea31b4090ac8a5e0f4404b, type: 2}
+    DropAmount: 3
+    PromptNameOverride: 
 --- !u!1 &1373424570
 GameObject:
   m_ObjectHideFlags: 0
