@@ -1,4 +1,3 @@
-using NUnit.Framework.Internal.Execution;
 using UnityEngine;
 
 public sealed class WorldItemSpawner : MonoBehaviour
@@ -14,13 +13,18 @@ public sealed class WorldItemSpawner : MonoBehaviour
 
     public bool SpawnAtFeet(ItemStack stack, Transform playerRoot)
     {
-        if (worldItemPilePrefab == null) { Debug.LogWarning("WorldItemSpawner: pile prefab not set."); return false; }
         if (playerRoot == null) return false;
+        return SpawnAtWorldPosition(stack, playerRoot.position);
+    }
+
+    public bool SpawnAtWorldPosition(ItemStack stack, Vector3 worldPos)
+    {
+        if (worldItemPilePrefab == null) { Debug.LogWarning("WorldItemSpawner: pile prefab not set."); return false; }
         if (stack.IsEmpty) return false;
 
-        Vector3 pos = playerRoot.position;
+        Vector3 pos = worldPos;
 
-        // snap to ground beneath player
+        // snap to ground beneath point
         Vector3 rayStart = pos + Vector3.up * groundRayUp;
         if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, groundRayUp + groundRayDown, groundMask, QueryTriggerInteraction.Ignore))
             pos = hit.point;
@@ -31,4 +35,5 @@ public sealed class WorldItemSpawner : MonoBehaviour
         wi.SetStack(stack.Item, stack.Quantity);
         return true;
     }
+
 }

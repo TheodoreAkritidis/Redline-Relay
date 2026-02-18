@@ -284,6 +284,7 @@ GameObject:
   - component: {fileID: 4144939046933883186}
   - component: {fileID: 7250050877548821893}
   - component: {fileID: 7975535109220833268}
+  - component: {fileID: -4186659933317579414}
   m_Layer: 0
   m_Name: URP_Tree_3
   m_TagString: Untagged
@@ -362,6 +363,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.36289012, y: 1.8454809, z: 0.44200042}
   m_Center: {x: -0.009486347, y: 0.9164088, z: -0.04754974}
+--- !u!114 &-4186659933317579414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5400752399725384465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cffe2f87916ac074da06c9730252f914, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceNodeInteractable
+  dropItem: {fileID: 11400000, guid: c52b483090d3bd1478bdcd8da66e8947, type: 2}
+  dropAmount: 2
+  verb: Harvest
+  destroyOnHarvest: 1
 --- !u!1 &7271073098528902193
 GameObject:
   m_ObjectHideFlags: 0

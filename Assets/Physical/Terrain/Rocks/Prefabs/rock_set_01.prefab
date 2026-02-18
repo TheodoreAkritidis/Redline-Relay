@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1952619694224511204}
   - component: {fileID: 4394930554705798190}
   - component: {fileID: 6622929244008177679}
+  - component: {fileID: -4704359981729191108}
   m_Layer: 0
   m_Name: rock_set_01
   m_TagString: Untagged
@@ -113,6 +114,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.7662256, y: 1.2568357, z: 2.5905523}
   m_Center: {x: -0.015772104, y: 0.61074305, z: -0.10977894}
+--- !u!114 &-4704359981729191108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2881479668610909691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cffe2f87916ac074da06c9730252f914, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceNodeInteractable
+  dropItem: {fileID: 11400000, guid: 4af2de02b0ea31b4090ac8a5e0f4404b, type: 2}
+  dropAmount: 1
+  verb: Mine
+  destroyOnHarvest: 1
 --- !u!1 &8838729550269347539
 GameObject:
   m_ObjectHideFlags: 0
