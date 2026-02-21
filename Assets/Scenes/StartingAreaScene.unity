@@ -692,13 +692,45 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7232671518399912799, guid: 773a41863aa7b8746b701b6f733a496a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 602345617}
   m_SourcePrefab: {fileID: 100100000, guid: 773a41863aa7b8746b701b6f733a496a, type: 3}
 --- !u!4 &602345614 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5190226389336357488, guid: 773a41863aa7b8746b701b6f733a496a, type: 3}
   m_PrefabInstance: {fileID: 602345613}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &602345615 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7232671518399912799, guid: 773a41863aa7b8746b701b6f733a496a, type: 3}
+  m_PrefabInstance: {fileID: 602345613}
+  m_PrefabAsset: {fileID: 0}
+--- !u!218 &602345616 stripped
+Terrain:
+  m_CorrespondingSourceObject: {fileID: 7558206655129227144, guid: 773a41863aa7b8746b701b6f733a496a, type: 3}
+  m_PrefabInstance: {fileID: 602345613}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &602345617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 602345615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c75b1784d18af749b458c3fb2f4fa13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TreeInitializer
+  treeObject1: {fileID: 1521319932559390546, guid: 915ac35a5aca31d4c9575633be0f6b82, type: 3}
+  treeObject2: {fileID: 299712424454941021, guid: 022485ff60e4a26418217d8ab778a812, type: 3}
+  treeObject3: {fileID: 5530652132047498927, guid: 40cc2dd6b744b344a9a4ea56076c47fb, type: 3}
+  treeObject4: {fileID: 5400752399725384465, guid: af90fe2f0f252bf4b8c2ab79bcd41edf, type: 3}
+  bushObject1: {fileID: 0}
+  bushObject2: {fileID: 0}
+  terrain: {fileID: 602345616}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1314,6 +1346,7 @@ MonoBehaviour:
   interactMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  terrainHarvest: {fileID: 0}
   inventoryUI: {fileID: 97276695}
 --- !u!114 &1230745133
 MonoBehaviour:
