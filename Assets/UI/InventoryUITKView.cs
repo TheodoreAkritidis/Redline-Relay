@@ -968,25 +968,53 @@ public sealed class InventoryUITKView : MonoBehaviour
         }
     }
 
+    private Vector2 _lastPanelPointerPos;
+    private bool _hasPanelPointerPos;
+    private bool _pointerHooked;
+
     private void UpdateCursorVisual(bool force = false)
     {
-        if (!built || cursorRoot == null) return;
+        if (!built || cursorRoot == null || root == null) return;
 
         var cursorContainer = cursorRoot.Q<VisualElement>("CursorContainer");
         if (cursorContainer == null) return;
 
-        if(!IsAnyMenuOpen || playerInventory == null || playerInventory.Model == null)
-{
+        if (!IsAnyMenuOpen || playerInventory == null || playerInventory.Model == null)
+        {
             cursorContainer.style.display = DisplayStyle.None;
             return;
         }
 
-        var mouseDevice = Mouse.current;
-        if (mouseDevice == null) return;
+        // Hook once: capture pointer position in PANEL space (no Y inversion, no scaling offsets).
+        if (!_pointerHooked)
+        {
+            _pointerHooked = true;
 
-        Vector2 mouse = mouseDevice.position.ReadValue();
-        cursorContainer.style.left = mouse.x - slotSize.x * 0.5f;
-        cursorContainer.style.top = (Screen.height - mouse.y) - slotSize.y * 0.5f;
+            // TrickleDown so we still get move events when hovering child elements (slots, panels, etc.)
+            root.RegisterCallback<PointerMoveEvent>(e =>
+            {
+                _lastPanelPointerPos = e.position;   // panel coords (top-left origin)
+                _hasPanelPointerPos = true;
+            }, TrickleDown.TrickleDown);
+
+            // Also update on pointer down so the icon snaps instantly when you click a slot
+            root.RegisterCallback<PointerDownEvent>(e =>
+            {
+                _lastPanelPointerPos = e.position;
+                _hasPanelPointerPos = true;
+            }, TrickleDown.TrickleDown);
+        }
+
+        if (!_hasPanelPointerPos)
+        {
+            // No pointer data yet; hide until we get a move/down event
+            cursorContainer.style.display = DisplayStyle.None;
+            return;
+        }
+
+        // Position the held icon centered on the pointer
+        cursorContainer.style.left = _lastPanelPointerPos.x - slotSize.x * 0.5f;
+        cursorContainer.style.top = _lastPanelPointerPos.y - slotSize.y * 0.5f;
 
         if (!playerInventory.Model.Cursor.HasItem)
         {
@@ -1002,6 +1030,7 @@ public sealed class InventoryUITKView : MonoBehaviour
         cursorIcon.image = held.Item.Icon != null ? held.Item.Icon.texture : null;
         cursorQty.text = held.Quantity > 1 ? held.Quantity.ToString() : "";
     }
+
 
     private readonly struct SlotView
     {
