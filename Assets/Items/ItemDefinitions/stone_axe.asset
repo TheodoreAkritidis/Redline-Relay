@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e00bb45fc057dc746852dfddd20611b7, type: 3}
-  m_Name: Log
+  m_Name: stone_axe
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  ItemId: log
-  MaxStack: 20
-  Icon: {fileID: 21300000, guid: bf8c8c9c088511f418307ecd58e2f2af, type: 3}
-  ItemType: material
-  WorldPrefab: {fileID: 5642910366407083158, guid: 01e1d4efb9236e44bb73446e75957260, type: 3}
+  ItemId: stone_axe
+  MaxStack: 1
+  Icon: {fileID: 21300000, guid: d9dd5dbb91c3e5d478df639f8da996a5, type: 3}
+  ItemType: axe
+  WorldPrefab: {fileID: 7847102251882683159, guid: ab152657cbc157d418c29979ad5bb723, type: 3}

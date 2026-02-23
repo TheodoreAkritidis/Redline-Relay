@@ -6,6 +6,10 @@ public sealed class ResourceNodeInteractable : MonoBehaviour, IInteractable
     [SerializeField] private ItemDefinition dropItem;
     [SerializeField] private int dropAmount = 1;
 
+    [Header("Required Tool Check")]
+    [SerializeField] private ItemDefinition tool;
+    [SerializeField] private GameObject player;
+
     [Header("UI")]
     [SerializeField] private string verb = "Harvest"; // "Chop", "Mine", etc.
 
@@ -14,11 +18,13 @@ public sealed class ResourceNodeInteractable : MonoBehaviour, IInteractable
 
     private WorldItemSpawner spawner;
     private Collider cachedCollider;
+    private PlayerInventoryComponent inventory;
 
     private void Awake()
     {
         spawner = FindFirstObjectByType<WorldItemSpawner>();
         cachedCollider = GetComponentInChildren<Collider>();
+        inventory = player.GetComponent<PlayerInventoryComponent>();
     }
 
     // IInteractable
@@ -40,6 +46,22 @@ public sealed class ResourceNodeInteractable : MonoBehaviour, IInteractable
         {
             Debug.LogWarning("ResourceNodeInteractable: No WorldItemSpawner found in scene.");
             return;
+        }
+
+        if ((player != null) && (tool != null))
+        {
+            string itemType = inventory.GetSelectedHotbarItemType();
+            string toolType = tool.GetItemType();
+
+            if (itemType == null)
+            {
+                return;
+            }
+
+            if (!string.Equals(itemType, toolType))
+            {
+                return;
+            }
         }
 
         int amt = Mathf.Max(1, dropAmount);

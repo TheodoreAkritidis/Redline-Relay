@@ -23,6 +23,18 @@ public sealed class ArrayItemContainer : IItemContainer
         return slots[index];
     }
 
+    public string GetSlotType(int index)
+    {
+        ValidateIndex(index);
+
+        if (slots[index].Item == null)
+        {
+            return "none";
+        }
+
+        return slots[index].Item.GetItemType();
+    }
+
     public void SetSlot(int index, ItemStack stack)
     {
         ValidateIndex(index);

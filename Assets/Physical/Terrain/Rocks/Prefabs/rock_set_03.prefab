@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -2737083141545690116}
   m_Layer: 0
   m_Name: rock_set_03
-  m_TagString: Untagged
+  m_TagString: Rock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -127,5 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNodeInteractable
   dropItem: {fileID: 11400000, guid: 4af2de02b0ea31b4090ac8a5e0f4404b, type: 2}
   dropAmount: 1
+  tool: {fileID: 11400000, guid: 3f0dc44ff817b684a8f8ec0d587b850a, type: 2}
+  player: {fileID: 0}
   verb: Mine
   destroyOnHarvest: 1

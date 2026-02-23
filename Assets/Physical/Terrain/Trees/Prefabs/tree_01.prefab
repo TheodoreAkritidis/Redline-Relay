@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -5779623347527611108}
   m_Layer: 0
   m_Name: tree_01
-  m_TagString: Untagged
+  m_TagString: Tree
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -128,5 +128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNodeInteractable
   dropItem: {fileID: 11400000, guid: c52b483090d3bd1478bdcd8da66e8947, type: 2}
   dropAmount: 4
+  tool: {fileID: 11400000, guid: 4cdd1766e5995004f99c1ac75df1eaa8, type: 2}
+  player: {fileID: 0}
   verb: Harvest
   destroyOnHarvest: 1

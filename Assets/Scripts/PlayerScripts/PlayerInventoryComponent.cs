@@ -47,4 +47,9 @@ public sealed class PlayerInventoryComponent : MonoBehaviour
     {
         return Model.Hotbar.GetSlot(SelectedHotbarIndex);
     }
+
+    public string GetSelectedHotbarItemType()
+    {
+        return Model.Hotbar.GetSlotType(SelectedHotbarIndex);
+    }
 }
