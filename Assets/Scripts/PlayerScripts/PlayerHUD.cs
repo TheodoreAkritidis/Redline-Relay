@@ -17,6 +17,9 @@ public class PlayerHUD : MonoBehaviour
     [Header("Health")]
     [SerializeField] private Image healthFill;
 
+    [Header("Temperature")]
+    [SerializeField] private Image tempFill;
+
     public void SetHunger( float current, float max, float sprintThreshold )
     {
         float normalized = (max <= 0f) ? 0f : Mathf.Clamp01(current / max);
@@ -54,5 +57,13 @@ public class PlayerHUD : MonoBehaviour
         float n = (max <= 0f) ? 0f : Mathf.Clamp01(current / max);
 
         healthFill.fillAmount = n;
+    }
+
+    public void SetTemperature( float current, float max )
+    {
+        float n = (max <= 0f) ? 0f : Mathf.Clamp01(current / max);
+
+
+        tempFill.fillAmount = n;
     }
 }

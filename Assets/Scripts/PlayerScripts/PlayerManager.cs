@@ -25,6 +25,7 @@ public class PlayerManager : MonoBehaviour
     private float emptyTimer;
 
     [Header("Temperature")]
+    public float maxTemp = 120f;
     public float internalTemp = 98f;
     public float targetTemp = 98f;
     public float envTemp = 70f; // placeholder, would be what the world temperature is atm
@@ -32,11 +33,11 @@ public class PlayerManager : MonoBehaviour
     public float envPull = 0.08f; // How strongly is the players internal temp pulled towards the env temp (higher = faster)
     public float bodyPull = 0.02f; // How strongly does the body pull back toward target temp (higher = faster)
 
-    public float tooHot = 108f;
-    public float tooCold = 88f;
+    public float tooHot = 108f; //78 
+    public float tooCold = 88f; // 55
 
     [Range(0f, 1f)]
-    public float tempResistance = 0.0f; // 0 = no resistance, 1 = complete resistance
+    public float tempResistance = 0.5f; // 0 = no resistance, 1 = complete resistance
     // This is a placeholder as of now but will be good for like clothes and stuff later on
 
     public bool isSprinting = false; // TO:DO connect this to the actual sprinting control
@@ -137,6 +138,8 @@ public class PlayerManager : MonoBehaviour
             hud.SetHunger(hunger, maxHunger, sprintThreshold);
             hud.SetThirst(thirst, maxThirst, sprintThreshold);
             hud.SetHealth(health, maxHealth);
+            hud.SetTemperature(internalTemp, maxTemp);
+
         }
 
         if ( controller != null )
