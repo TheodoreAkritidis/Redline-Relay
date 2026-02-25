@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
 public sealed class Interactor : MonoBehaviour
 {
     [Header("Raycast")]
@@ -13,24 +12,26 @@ public sealed class Interactor : MonoBehaviour
     [Header("terrain")]
     [SerializeField] private TerrainHarvestPainter terrainHarvest;
 
-
     [Header("UI")]
     [SerializeField] private InventoryUITKView inventoryUI;
 
-    private IInteractable current;
+    [Header("Player")]
+    [SerializeField] private PlayerInventoryComponent playerInventory;
 
+    private IInteractable current;
+    private bool currentBlocked;
 
     private void Awake()
     {
         if (terrainHarvest == null) terrainHarvest = FindFirstObjectByType<TerrainHarvestPainter>();
-
         if (inventoryUI == null) inventoryUI = FindFirstObjectByType<InventoryUITKView>();
+        if (playerInventory == null) playerInventory = GetComponent<PlayerInventoryComponent>();
+
         if (cameraTransform == null)
         {
             var cam = Camera.main;
             if (cam != null) cameraTransform = cam.transform;
         }
-
     }
 
     private void Update()
@@ -41,6 +42,7 @@ public sealed class Interactor : MonoBehaviour
     private void ResolveTarget()
     {
         current = null;
+        currentBlocked = false;
 
         if (inventoryUI != null && (inventoryUI.IsBackpackOpen || inventoryUI.IsCraftingOpen))
         {
@@ -68,19 +70,44 @@ public sealed class Interactor : MonoBehaviour
                 if (interactable == null) continue;
 
                 current = interactable;
-                inventoryUI?.SetCrosshairPrompt(current.GetPrompt());
+
+                // Tool gate support
+                if (interactable is IToolGatedInteractable gated &&
+                    !gated.CanInteractWith(gameObject, out string blockedPrompt))
+                {
+                    currentBlocked = true;
+
+                    // IMPORTANT: message WITHOUT "E to"
+                    inventoryUI?.SetCrosshairMessage(blockedPrompt);
+                }
+                else
+                {
+                    inventoryUI?.SetCrosshairPrompt(current.GetPrompt());
+                }
+
                 return;
             }
         }
 
-        // 2) Fallback: painted terrain trees/rocks via TerrainHarvestPainter
+        // 2) Terrain fallback
         if (terrainHarvest != null)
         {
             terrainHarvest.ResolveFromRay(r, interactRange);
             if (terrainHarvest.HasTarget)
             {
                 current = terrainHarvest;
-                inventoryUI?.SetCrosshairPrompt(current.GetPrompt());
+
+                if (current is IToolGatedInteractable gated &&
+                    !gated.CanInteractWith(gameObject, out string blockedPrompt))
+                {
+                    currentBlocked = true;
+                    inventoryUI?.SetCrosshairMessage(blockedPrompt);
+                }
+                else
+                {
+                    inventoryUI?.SetCrosshairPrompt(current.GetPrompt());
+                }
+
                 return;
             }
         }
@@ -96,8 +123,8 @@ public sealed class Interactor : MonoBehaviour
             return;
 
         if (current == null) return;
+        if (currentBlocked) return;
 
         current.Interact(gameObject);
     }
-
 }

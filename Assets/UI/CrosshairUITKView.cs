@@ -75,4 +75,14 @@ public sealed class CrosshairUITK : MonoBehaviour
         centerLabel.text = $"E to {a}";
         centerLabel.style.fontSize = promptFontSize;
     }
+
+    public void SetMessage(string message)
+    {
+        if (centerLabel == null) return;
+
+        string m = string.IsNullOrWhiteSpace(message) ? defaultGlyph : message.Trim();
+        centerLabel.text = m;
+        centerLabel.style.fontSize = promptFontSize;
+    }
+
 }
