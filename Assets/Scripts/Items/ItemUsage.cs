@@ -22,7 +22,7 @@ public sealed class ItemUsage : MonoBehaviour
     public void OnUse(InputValue v)
     {
         ItemDefinition item = inv.GetSelectedHotbarItem();
-        bool consumed;
+        bool consumed = false;
 
         if (item == null)
         {
