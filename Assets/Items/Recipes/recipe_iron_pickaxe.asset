@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e142bc91933ed6489a7a272a015326f, type: 3}
   m_Name: recipe_iron_pickaxe
   m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipe
-  DisplayName: Copper Pickaxe
-  OutputItem: {fileID: 11400000, guid: 9a3493e6b00ddd94b97f8ce94a74b986, type: 2}
+  DisplayName: Iron Pickaxe
+  OutputItem: {fileID: 11400000, guid: 957aa9b07fe591c4c9c3e8d1a416f8ec, type: 2}
   OutputAmount: 1
   Ingredients:
   - Item: {fileID: 11400000, guid: c52b483090d3bd1478bdcd8da66e8947, type: 2}
     Amount: 2
-  - Item: {fileID: 11400000, guid: 853c7b50ee4e18a4b8a8ae204c48b722, type: 2}
+  - Item: {fileID: 11400000, guid: a9ac54f174cdd9b4bbc2e1629f9a5be5, type: 2}
     Amount: 4

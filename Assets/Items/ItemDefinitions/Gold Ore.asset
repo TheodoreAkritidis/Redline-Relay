@@ -14,5 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   ItemId: gold_ore
   MaxStack: 5
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 6a77d8da3c13a794a89d7933b3837190, type: 3}
   WorldPrefab: {fileID: 0}
+  DestroyOnUse: 0
+  IsFood: 0
+  FoodValue: 0
+  IsWater: 0
+  WaterValue: 0
