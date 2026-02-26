@@ -132,7 +132,7 @@ public class PlayerManager : MonoBehaviour
         HealthDrain();
 
 
-        Debug.Log("Hunger: " + hunger);
+        // Debug.Log("Hunger: " + hunger);
         if ( hud != null )
         {
             hud.SetHunger(hunger, maxHunger, sprintThreshold);
@@ -144,5 +144,55 @@ public class PlayerManager : MonoBehaviour
 
         if ( controller != null )
             controller.SetSprintAllowed(CanSprint);
+    }
+
+    // Returns true if successfully drank (useful for consumables)
+    public bool TryDrink( float waterValue )
+    {
+        // Check if we're currently at max thirst
+        if ( thirst == maxThirst )
+        {
+            return false;
+        }
+
+        float tempThirst = thirst + waterValue;
+
+        // Prevent exceeding max thirst
+        if ( tempThirst >= maxThirst )
+        {
+            thirst = maxThirst;
+        }
+        else
+        {
+            thirst += tempThirst;
+        }
+
+        hud.SetThirst(thirst, maxThirst, sprintThreshold);
+        return true;
+    }
+
+    // Returns true if successfully ate (useful for consumables)
+    public bool TryEat( float foodValue )
+    {
+        // Check if we're currently at max hunger
+        if ( hunger == maxHunger )
+        {
+            return false;
+        }
+
+        float tempHunger = hunger + foodValue;
+
+        // Prevent exceeding max hunger
+        if ( tempHunger >= maxHunger )
+        {
+            hunger = maxHunger;
+        }
+        else
+        {
+            hunger += tempHunger;
+        }
+
+        hud.SetHunger(hunger, maxHunger, sprintThreshold);
+        return true;
     }
 }
