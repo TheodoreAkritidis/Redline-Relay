@@ -132,5 +132,5 @@ MonoBehaviour:
   dropRemainderIfFull: 1
   requiredTool: {fileID: 11400000, guid: 3f0dc44ff817b684a8f8ec0d587b850a, type: 2}
   requiredToolNameOverride: Stone Pickaxe
-  verb: Mine Stone
+  verb: Mine
   destroyOnHarvest: 1
