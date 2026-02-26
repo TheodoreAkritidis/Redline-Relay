@@ -53,7 +53,7 @@ public sealed class PlayerInventoryComponent : MonoBehaviour
         return Model.Hotbar.GetSlot(SelectedHotbarIndex).Item;
     }
 
-    public void UseSelectedHotbarItem()
+    public void ConsumeSelectedHotbarItem()
     {
         var hotbar = Model.Hotbar;
         ItemStack stack = hotbar.GetSlot(SelectedHotbarIndex);

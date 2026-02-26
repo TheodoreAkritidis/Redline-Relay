@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public sealed class ItemUsage : MonoBehaviour
+public class ItemUsage : MonoBehaviour
 {
     [SerializeField] private PlayerInventoryComponent inv;
     [SerializeField] private PlayerManager player;
+
+    public bool useBlocked = false;
 
     private void Awake()
     {
@@ -21,6 +23,11 @@ public sealed class ItemUsage : MonoBehaviour
 
     public void OnUse(InputValue v)
     {
+        if (useBlocked)
+        {
+            return;
+        }
+
         ItemDefinition item = inv.GetSelectedHotbarItem();
         bool consumed = false;
 
@@ -41,7 +48,7 @@ public sealed class ItemUsage : MonoBehaviour
 
         if (item.DestroyOnUse && consumed)
         {
-            inv.UseSelectedHotbarItem();
+            inv.ConsumeSelectedHotbarItem();
             inv.NotifyInventoryChanged();
         }
     }

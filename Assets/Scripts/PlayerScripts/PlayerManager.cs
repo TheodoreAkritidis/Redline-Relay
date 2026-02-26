@@ -164,7 +164,7 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            thirst += tempThirst;
+            thirst = tempThirst;
         }
 
         hud.SetThirst(thirst, maxThirst, sprintThreshold);
