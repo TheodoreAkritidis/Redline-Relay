@@ -3516,6 +3516,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipeDatabase
   recipes:
   - {fileID: 11400000, guid: 5e94f120faec41e428ae3836d1b38547, type: 2}
+  - {fileID: 11400000, guid: d6646910c24c8b048b85c4cc92c5e09b, type: 2}
 --- !u!1001 &280512807
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19537,10 +19538,10 @@ MonoBehaviour:
   hud: {fileID: 1214880597}
   maxHunger: 100
   hunger: 100
-  hungerDrainRate: 5
+  hungerDrainRate: 0.1
   maxThirst: 100
   thirst: 100
-  thirstDrainRate: 5
+  thirstDrainRate: 0.1
   maxHealth: 100
   health: 100
   healthDrainRateTemp: 0.01
@@ -24109,7 +24110,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 444823c9924c8034a9888d9171ba4ca3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaterSource
-  CanteenItem: {fileID: 11400000, guid: de1671eac4bdaab4fa86eb4861d2804e, type: 2}
   WaterValue: 25
 --- !u!1001 &1527043171
 PrefabInstance:
