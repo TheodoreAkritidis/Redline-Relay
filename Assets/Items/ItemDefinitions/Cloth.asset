@@ -14,5 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   ItemId: cloth
   MaxStack: 10
-  Icon: {fileID: 0}
-  WorldPrefab: {fileID: 0}
+  Icon: {fileID: 21300000, guid: d0fadede03f42004bb2f9da06a5c155a, type: 3}
+  WorldPrefab: {fileID: 8966556970357897431, guid: 43c6c5c4877f6be4c9e5b8475a1d34ed, type: 3}
+  DestroyOnUse: 0
+  IsFood: 0
+  FoodValue: 0
+  IsWater: 0
+  WaterValue: 0
