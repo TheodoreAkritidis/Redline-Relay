@@ -14,5 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   ItemId: simple_circuit
   MaxStack: 2
-  Icon: {fileID: 0}
-  WorldPrefab: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 60f54e135c2ad6145b5f732c5a4d2385, type: 3}
+  WorldPrefab: {fileID: 9017559403994427908, guid: fe422047c9dab624586dffa301f888f0, type: 3}
+  DestroyOnUse: 0
+  IsFood: 0
+  FoodValue: 0
+  IsWater: 0
+  WaterValue: 0
