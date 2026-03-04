@@ -177,7 +177,7 @@ MonoBehaviour:
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 0
+  m_FillMethod: 1
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -543,7 +543,7 @@ MonoBehaviour:
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 0
+  m_FillMethod: 1
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -699,8 +699,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62499177bdf961146b35987c9f0f67cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHUD
-  hungerFill: {fileID: 1888193318152963375}
-  thirstFill: {fileID: 8275011292265293172}
+  hungerTopFill: {fileID: 0}
+  hungerBottomFill: {fileID: 0}
+  thirstTopFill: {fileID: 0}
+  thirstBottomFill: {fileID: 0}
   healthFill: {fileID: 4121430788147184686}
   tempFill: {fileID: 2281386125484826034}
 --- !u!1 &8142738905728553827
