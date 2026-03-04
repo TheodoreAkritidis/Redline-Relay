@@ -135,8 +135,8 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("Hunger: " + hunger);
         if ( hud != null )
         {
-            hud.SetHunger(hunger, maxHunger, sprintThreshold);
-            hud.SetThirst(thirst, maxThirst, sprintThreshold);
+            hud.SetHunger(hunger, maxHunger);
+            hud.SetThirst(thirst, maxThirst);
             hud.SetHealth(health, maxHealth);
             hud.SetTemperature(internalTemp, maxTemp);
 
