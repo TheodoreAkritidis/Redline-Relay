@@ -149,7 +149,7 @@ public class PlayerManager : MonoBehaviour
         HealthDrain();
 
 
-        Debug.Log("Hunger: " + hunger);
+        // Debug.Log("Hunger: " + hunger);
         if ( hud != null )
         {
             hud.SetHunger(hunger, maxHunger);
