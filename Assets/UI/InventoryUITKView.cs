@@ -344,7 +344,7 @@ public sealed class InventoryUITKView : MonoBehaviour
         matsContainer.style.alignSelf = Align.Stretch;
         midPanel.Add(matsContainer);
 
-        craftMaterialLabels = new Label[4];
+        craftMaterialLabels = new Label[5];
         for (int i = 0; i < craftMaterialLabels.Length; i++)
         {
             var l = new Label("");
