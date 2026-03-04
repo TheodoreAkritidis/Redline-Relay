@@ -654,9 +654,7 @@ MonoBehaviour:
   dropAmount: 4
   addDirectToInventory: 1
   dropRemainderIfFull: 1
-  requiredTool: {fileID: 0}
-  requiredToolNameOverride: 
-  verb: Harvest
+  verb: Harvest Berry
   destroyOnHarvest: 1
 --- !u!135 &42353797337797438
 SphereCollider:

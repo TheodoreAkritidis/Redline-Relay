@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e00bb45fc057dc746852dfddd20611b7, type: 3}
-  m_Name: Berry
+  m_Name: stone_axe
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  ItemId: berry
-  MaxStack: 40
-  Icon: {fileID: 21300000, guid: cab642c8943f9a144ab06c603912a6d9, type: 3}
-  WorldPrefab: {fileID: 5906608606846821691, guid: 3f2f62d56b678ca45adc3c69e99e57a9, type: 3}
+  ItemId: stone_axe
+  MaxStack: 1
+  Icon: {fileID: 21300000, guid: d9dd5dbb91c3e5d478df639f8da996a5, type: 3}
+  ItemType: axe
+  WorldPrefab: {fileID: 7847102251882683159, guid: ab152657cbc157d418c29979ad5bb723, type: 3}
