@@ -92,7 +92,14 @@ public sealed class InventoryUITKView : MonoBehaviour
     private Label crosshairLabel;
 
     private bool backpackOpen;
+    public void SetCrosshairMessage(string message)
+    {
+        if (!built || crosshairLabel == null) return;
 
+        string m = string.IsNullOrWhiteSpace(message) ? idleCrosshairGlyph : message.Trim();
+        crosshairLabel.text = m;
+        crosshairLabel.style.fontSize = promptFontSize;
+    }
     private bool CanBuildNow()
     {
         if (uiDocument == null) return false;
@@ -224,8 +231,8 @@ public sealed class InventoryUITKView : MonoBehaviour
         
         
         BuildBackpackOverlay();
-        BuildHotbarHud();
         BuildCraftingOverlay();
+        BuildHotbarHud();
         BuildCursorVisual();
         BuildCrosshairHud();  
 
@@ -337,7 +344,7 @@ public sealed class InventoryUITKView : MonoBehaviour
         matsContainer.style.alignSelf = Align.Stretch;
         midPanel.Add(matsContainer);
 
-        craftMaterialLabels = new Label[4];
+        craftMaterialLabels = new Label[5];
         for (int i = 0; i < craftMaterialLabels.Length; i++)
         {
             var l = new Label("");

@@ -53,10 +53,22 @@ public class SimpleFpsController : MonoBehaviour
 
     private bool UiBlocked => inventoryOpen || craftingOpen || (devConsole != null && devConsole.IsOpen);
 
-    private void Awake()
+    private bool sprintAllowed = true;
+
+    public void SetSprintAllowed( bool allowed )
     {
-        if (crosshairUI == null) crosshairUI = FindFirstObjectByType<CrosshairUITK>();
-        if (interactor == null) interactor = GetComponent<Interactor>();
+        sprintAllowed = allowed;
+
+        if ( !sprintAllowed ) sprintHeld = false; // Prevent sprinting if it just became disallowed
+    }
+
+    public bool WantsSprint => !UiBlocked && sprintHeld && moveInput.sqrMagnitude > 0.01f;
+    public bool IsSprinting => WantsSprint && sprintAllowed;
+
+    private void Awake( )
+    {
+        if ( crosshairUI == null ) crosshairUI = FindFirstObjectByType<CrosshairUITK>();
+        if ( interactor == null ) interactor = GetComponent<Interactor>();
 
         rb = GetComponent<Rigidbody>();
         rb.interpolation = RigidbodyInterpolation.Interpolate;
@@ -64,22 +76,22 @@ public class SimpleFpsController : MonoBehaviour
 
         yaw = transform.eulerAngles.y;
 
-        if (playerInventory == null)
+        if ( playerInventory == null )
             playerInventory = GetComponent<PlayerInventoryComponent>();
 
-        if (devConsole == null)
+        if ( devConsole == null )
             devConsole = FindFirstObjectByType<DevConsole>();
     }
 
-    private void Start()
+    private void Start( )
     {
         SetInventoryOpen(false);
         playerInventory?.SetSelectedHotbarIndex(0);
     }
 
-    private void Update()
+    private void Update( )
     {
-        if (UiBlocked)
+        if ( UiBlocked )
             return;
 
         yaw += lookDelta.x * lookSensitivity;
@@ -88,13 +100,13 @@ public class SimpleFpsController : MonoBehaviour
 
         rb.MoveRotation(Quaternion.Euler(0f, yaw, 0f));
 
-        if (cameraPivot != null)
+        if ( cameraPivot != null )
             cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
-    private void FixedUpdate()
+    private void FixedUpdate( )
     {
-        if (UiBlocked)
+        if ( UiBlocked )
         {
             Vector3 v = rb.linearVelocity;
             rb.linearVelocity = new Vector3(0f, v.y, 0f);
@@ -104,9 +116,9 @@ public class SimpleFpsController : MonoBehaviour
         bool grounded = IsGrounded();
         Vector3 v2 = rb.linearVelocity;
 
-        if (grounded)
+        if ( grounded )
         {
-            float speed = moveSpeed * (sprintHeld ? sprintMultiplier : 1f);
+            float speed = moveSpeed * (IsSprinting ? sprintMultiplier : 1f);
 
             Vector3 wishDir = (transform.right * moveInput.x + transform.forward * moveInput.y);
             wishDir = Vector3.ClampMagnitude(wishDir, 1f);
@@ -115,13 +127,13 @@ public class SimpleFpsController : MonoBehaviour
             rb.linearVelocity = new Vector3(targetHorizontal.x, v2.y, targetHorizontal.z);
         }
 
-        if (jumpQueued)
+        if ( jumpQueued )
         {
             jumpQueued = false;
 
-            if (grounded)
+            if ( grounded )
             {
-                if (rb.linearVelocity.y < 0f)
+                if ( rb.linearVelocity.y < 0f )
                     rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
                 rb.AddForce(Vector3.up * jumpImpulse, ForceMode.Impulse);
@@ -129,9 +141,9 @@ public class SimpleFpsController : MonoBehaviour
         }
     }
 
-    private bool IsGrounded()
+    private bool IsGrounded( )
     {
-        if (groundCheck == null) return false;
+        if ( groundCheck == null ) return false;
 
         return Physics.CheckSphere(
             groundCheck.position,
@@ -141,17 +153,17 @@ public class SimpleFpsController : MonoBehaviour
         );
     }
 
-    private void SetInventoryOpen(bool open)
+    private void SetInventoryOpen( bool open )
     {
         inventoryOpen = open;
         // Hide HUD crosshair while inventory is open
-        if (crosshairUI != null)
+        if ( crosshairUI != null )
             crosshairUI.SetVisible(!open);
 
         // Prevent interaction raycast / E while inventory open
-        if (interactor != null)
+        if ( interactor != null )
             interactor.enabled = !open;
-        if (inventoryOpen)
+        if ( inventoryOpen )
         {
             moveInput = Vector2.zero;
             lookDelta = Vector2.zero;
@@ -164,29 +176,29 @@ public class SimpleFpsController : MonoBehaviour
         else
         {
             // If console is open, don't re-lock the cursor here.
-            if (devConsole == null || !devConsole.IsOpen)
+            if ( devConsole == null || !devConsole.IsOpen )
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
         }
 
-        if (inventoryUI != null)
+        if ( inventoryUI != null )
             inventoryUI.SetBackpackOpen(inventoryOpen);
     }
-    private void SetCraftingOpen(bool open)
+    private void SetCraftingOpen( bool open )
     {
         craftingOpen = open;
 
         // Hide HUD crosshair while any UI is open
-        if (crosshairUI != null)
+        if ( crosshairUI != null )
             crosshairUI.SetVisible(!(inventoryOpen || craftingOpen));
 
         // Prevent interaction while UI open
-        if (interactor != null)
+        if ( interactor != null )
             interactor.enabled = !(inventoryOpen || craftingOpen);
 
-        if (inventoryOpen || craftingOpen)
+        if ( inventoryOpen || craftingOpen )
         {
             moveInput = Vector2.zero;
             lookDelta = Vector2.zero;
@@ -198,98 +210,98 @@ public class SimpleFpsController : MonoBehaviour
         }
         else
         {
-            if (devConsole == null || !devConsole.IsOpen)
+            if ( devConsole == null || !devConsole.IsOpen )
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
         }
 
-        if (inventoryUI != null)
+        if ( inventoryUI != null )
             inventoryUI.SetCraftingOpen(craftingOpen);
     }
 
-    public void OnCrafting(InputValue value)
+    public void OnCrafting( InputValue value )
     {
-        if (!value.isPressed) return;
-        if (devConsole != null && devConsole.IsOpen) return;
+        if ( !value.isPressed ) return;
+        if ( devConsole != null && devConsole.IsOpen ) return;
 
         // If inventory is open, close it first (optional)
-        if (inventoryOpen) SetInventoryOpen(false);
+        if ( inventoryOpen ) SetInventoryOpen(false);
 
         SetCraftingOpen(!craftingOpen);
     }
 
 
     // --- Input System (PlayerInput: Send Messages) ---
-    public void OnMove(InputValue value)
+    public void OnMove( InputValue value )
     {
-        if (UiBlocked) { moveInput = Vector2.zero; return; }
+        if ( UiBlocked ) { moveInput = Vector2.zero; return; }
         moveInput = value.Get<Vector2>();
     }
 
-    public void OnLook(InputValue value)
+    public void OnLook( InputValue value )
     {
-        if (UiBlocked) { lookDelta = Vector2.zero; return; }
+        if ( UiBlocked ) { lookDelta = Vector2.zero; return; }
         lookDelta = value.Get<Vector2>();
     }
 
-    public void OnSprint(InputValue value)
+    public void OnSprint( InputValue value )
     {
-        if (UiBlocked) { sprintHeld = false; return; }
+        if ( UiBlocked ) { sprintHeld = false; return; }
         sprintHeld = value.Get<float>() > 0.1f;
     }
 
-    public void OnJump(InputValue value)
+    public void OnJump( InputValue value )
     {
-        if (UiBlocked) return;
-        if (value.isPressed) jumpQueued = true;
+        if ( UiBlocked ) return;
+        if ( value.isPressed ) jumpQueued = true;
     }
 
-    public void OnInventory(InputValue value)
+    public void OnInventory( InputValue value )
     {
-        if (!value.isPressed) return;
-        if (devConsole != null && devConsole.IsOpen) return; // block tab while console open
-        if (craftingOpen) return;
+        if ( !value.isPressed ) return;
+        if ( devConsole != null && devConsole.IsOpen ) return; // block tab while console open
+        if ( craftingOpen ) return;
         SetInventoryOpen(!inventoryOpen);
     }
-    private void StepHotbar(int delta)
+    private void StepHotbar( int delta )
     {
-        if (playerInventory == null || playerInventory.Model == null || playerInventory.Model.Hotbar == null)
+        if ( playerInventory == null || playerInventory.Model == null || playerInventory.Model.Hotbar == null )
             return;
 
         int count = playerInventory.Model.Hotbar.SlotCount;
-        if (count <= 0) return;
+        if ( count <= 0 ) return;
 
         int cur = playerInventory.SelectedHotbarIndex;
         int next = (cur + delta) % count;
-        if (next < 0) next += count;
+        if ( next < 0 ) next += count;
 
         playerInventory.SetSelectedHotbarIndex(next);
     }
 
 
-    public void OnHotbarNext(InputValue v)
+    public void OnHotbarNext( InputValue v )
     {
-        if (!v.isPressed) return;
-        if (inventoryOpen) return;
+        if ( !v.isPressed ) return;
+        if ( inventoryOpen ) return;
         StepHotbar(+1);
     }
 
-    public void OnHotbarPrev(InputValue v)
+    public void OnHotbarPrev( InputValue v )
     {
-        if (!v.isPressed) return;
-        if (inventoryOpen) return;
+        if ( !v.isPressed ) return;
+        if ( inventoryOpen ) return;
         StepHotbar(-1);
     }
 
     // Mouse scroll is a Vector2 (x,y). We care about y.
-    public void OnHotbarScroll(InputValue v)
+    public void OnHotbarScroll( InputValue v )
     {
-        if (inventoryOpen) return;
+        if ( inventoryOpen ) return;
 
         Vector2 scroll = v.Get<Vector2>();
-        if (Mathf.Abs(scroll.y) < 0.01f) return;
+        if ( Mathf.Abs(scroll.y) < 0.01f ) return;
 
         // Typical FPS convention: wheel up -> previous slot, wheel down -> next slot
         StepHotbar(scroll.y > 0f ? -1 : +1);
@@ -298,22 +310,22 @@ public class SimpleFpsController : MonoBehaviour
 
 
     // Hotbar selection (bind these to 1..0 in Input Actions)
-    public void OnHotbar1(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(0); }
-    public void OnHotbar2(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(1); }
-    public void OnHotbar3(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(2); }
-    public void OnHotbar4(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(3); }
-    public void OnHotbar5(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(4); }
-    public void OnHotbar6(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(5); }
-    public void OnHotbar7(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(6); }
-    public void OnHotbar8(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(7); }
-    public void OnHotbar9(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(8); }
-    public void OnHotbar0(InputValue v) { if (!UiBlocked && v.isPressed) playerInventory?.SetSelectedHotbarIndex(9); }
+    public void OnHotbar1( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(0); }
+    public void OnHotbar2( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(1); }
+    public void OnHotbar3( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(2); }
+    public void OnHotbar4( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(3); }
+    public void OnHotbar5( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(4); }
+    public void OnHotbar6( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(5); }
+    public void OnHotbar7( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(6); }
+    public void OnHotbar8( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(7); }
+    public void OnHotbar9( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(8); }
+    public void OnHotbar0( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(9); }
 
-    private void OnGUI()
+    private void OnGUI( )
     {
-        if (!showSpeedDebug || rb == null) return;
+        if ( !showSpeedDebug || rb == null ) return;
 
-        if (speedStyle == null)
+        if ( speedStyle == null )
         {
             speedStyle = new GUIStyle(GUI.skin.label)
             {

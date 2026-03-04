@@ -104,7 +104,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNodeInteractable
   dropItem: {fileID: 11400000, guid: c52b483090d3bd1478bdcd8da66e8947, type: 2}
   dropAmount: 6
-  verb: Harvest
+  addDirectToInventory: 0
+  dropRemainderIfFull: 1
+  requiredTool: {fileID: 11400000, guid: 4cdd1766e5995004f99c1ac75df1eaa8, type: 2}
+  requiredToolNameOverride: Stone Axe
+  verb: Chop
   destroyOnHarvest: 1
 --- !u!1 &3393009937179818794
 GameObject:
