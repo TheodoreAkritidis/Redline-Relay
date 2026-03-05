@@ -6,15 +6,20 @@ using UnityEngine.UIElements;
 
 public class EnemyManager : MonoBehaviour
 {
-    public GameObject _enemyPrefab; // Enemy in the prefab
+    // Enemy reference   
+    public GameObject _enemyPrefab;
     public float spawnRate = 5f;
 
     // Spawn area bounds
-    public float areaBoundMinX = 500f;
-    public float areaBoundMaxX = 740f;
-    public float areaBoundMinZ = 400f;
-    public float areaBoundMaxZ = 600f;
+    public float areaBoundMinX = 600f;
+    public float areaBoundMaxX = 700f;
+    public float areaBoundMinZ = 490f;
+    public float areaBoundMaxZ = 570f;
     public float areaBoundY = 1f;
+
+    // Player reference 
+    public Transform player;
+    public float minSpawnDistanceFromPlayer = 5000f;
 
     void Awake()
     {
@@ -24,14 +29,24 @@ public class EnemyManager : MonoBehaviour
 
     void SpawnEnemy()
     {
-        float randomPosX = Random.Range(areaBoundMinX, areaBoundMaxX);
-        float randomPosZ = Random.Range(areaBoundMinZ, areaBoundMaxZ);
+        Vector3 spawnPosition;
 
-        Vector3 spawnPosition = new Vector3(randomPosX, areaBoundY, randomPosZ);
+        int spawnAttempts = 0;
+        do
+        {
+            float randomPosX = Random.Range(areaBoundMinX, areaBoundMaxX);
+            float randomPosZ = Random.Range(areaBoundMinZ, areaBoundMaxZ);
+
+            spawnPosition = new Vector3(randomPosX, areaBoundY, randomPosZ);
+            spawnAttempts++;
+        } while (Vector3.Distance(spawnPosition, player.position) < minSpawnDistanceFromPlayer && spawnAttempts < 100);
 
         Debug.Log($"Spawning enemy at {spawnPosition}");
 
         GameObject gameObject = Instantiate(_enemyPrefab, spawnPosition, Quaternion.identity);
+        
+        EnemyController enemyController = gameObject.GetComponent<EnemyController>();
+        enemyController.player = player;
     }
 
     IEnumerator SpawnEnemyCoroutine()

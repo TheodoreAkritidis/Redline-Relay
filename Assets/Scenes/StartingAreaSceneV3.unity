@@ -13335,11 +13335,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager
   _enemyPrefab: {fileID: 1757905661}
   spawnRate: 5
-  areaBoundMinX: 500
-  areaBoundMaxX: 740
-  areaBoundMinZ: 400
-  areaBoundMaxZ: 600
+  areaBoundMinX: 600
+  areaBoundMaxX: 700
+  areaBoundMinZ: 490
+  areaBoundMaxZ: 570
   areaBoundY: 1
+  player: {fileID: 1230745123}
+  minSpawnDistanceFromPlayer: 5000
 --- !u!1001 &883029014
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34325,6 +34327,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1051899580}
     m_Modifications:
     - target: {fileID: -5276479013530159962, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1230745123}
+    - target: {fileID: -5276479013530159962, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
       propertyPath: enemySpeed
       value: 50
       objectReference: {fileID: 0}
@@ -34333,8 +34339,20 @@ PrefabInstance:
       value: 700
       objectReference: {fileID: 0}
     - target: {fileID: -5276479013530159962, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
+      propertyPath: wanderRadius
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: -5276479013530159962, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
       propertyPath: rightBoundary
       value: 700
+      objectReference: {fileID: 0}
+    - target: {fileID: -5276479013530159962, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
+      propertyPath: detectionRadius
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: -5276479013530159962, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 7098272496761430649, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
       propertyPath: m_Name
@@ -34342,7 +34360,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7684542831106006478, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 634.9
+      value: 637.3
       objectReference: {fileID: 0}
     - target: {fileID: 7684542831106006478, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
       propertyPath: m_LocalPosition.y
@@ -34350,7 +34368,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7684542831106006478, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 522
+      value: 523.8
       objectReference: {fileID: 0}
     - target: {fileID: 7684542831106006478, guid: d6f6dccc33ff1fc4ca0011ee0db5f2ab, type: 3}
       propertyPath: m_LocalRotation.w
