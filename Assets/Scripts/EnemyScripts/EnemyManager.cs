@@ -6,23 +6,28 @@ using UnityEngine.UIElements;
 
 public class EnemyManager : MonoBehaviour
 {
-    // Enemy reference   
+    [Header("Enemy Reference")]
     public GameObject _enemyPrefab;
     public float spawnRate = 5f;
 
-    // Spawn area bounds
+    [Header("Spawn Area Bounds")]
     public float areaBoundMinX = 600f;
     public float areaBoundMaxX = 700f;
     public float areaBoundMinZ = 490f;
     public float areaBoundMaxZ = 570f;
     public float areaBoundY = 1f;
 
-    // Player reference 
+    [Header("Player Reference")]
     public Transform player;
-    public float minSpawnDistanceFromPlayer = 5000f;
+    public float minSpawnDistanceFromPlayer = 5f;
 
     void Awake()
     {
+        if (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        }
+
         Debug.Log("EnemyManager Awake called");
         StartCoroutine(SpawnEnemyCoroutine());
     }
@@ -36,6 +41,9 @@ public class EnemyManager : MonoBehaviour
         {
             float randomPosX = Random.Range(areaBoundMinX, areaBoundMaxX);
             float randomPosZ = Random.Range(areaBoundMinZ, areaBoundMaxZ);
+
+            float fowardAppearance = Random.value;
+            Vector3 forwardOffset = player.forward * Random.Range(5f, 15f) * fowardAppearance;
 
             spawnPosition = new Vector3(randomPosX, areaBoundY, randomPosZ);
             spawnAttempts++;

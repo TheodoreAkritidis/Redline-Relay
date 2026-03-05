@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    // Enemy reference
+    [Header("Enemy Reference")]
     [SerializeField] float enemyWanderSpeed = 50f;
     [SerializeField] float enemyChaseSpeed = 20f;
     [SerializeField] float stopDistance = 2f;
     public float direction = 1f;
     public float wanderRadius = 20f;
 
-    // Player reference 
+    [Header("Player Reference")]
     public Transform player;
     public float detectionRadius = 20f;
 

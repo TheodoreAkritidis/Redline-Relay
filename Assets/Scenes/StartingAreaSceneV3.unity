@@ -13341,7 +13341,7 @@ MonoBehaviour:
   areaBoundMaxZ: 570
   areaBoundY: 1
   player: {fileID: 1230745123}
-  minSpawnDistanceFromPlayer: 5000
+  minSpawnDistanceFromPlayer: 5
 --- !u!1001 &883029014
 PrefabInstance:
   m_ObjectHideFlags: 0
