@@ -5,6 +5,9 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private SimpleFpsController controller;
     [SerializeField] private PlayerHUD hud;
 
+    // TODO hookup to day/night cycle
+    bool isNight = false;
+
     [Header("Hunger")]
     public float maxHunger = 100f;
     public float hunger = 100f;
@@ -25,20 +28,19 @@ public class PlayerManager : MonoBehaviour
     private float emptyTimer;
 
     [Header("Temperature")]
-    public float maxTemp = 120f;
-    public float internalTemp = 98f;
-    public float targetTemp = 98f;
-    public float envTemp = 70f; // placeholder, would be what the world temperature is atm
+    public float maxTemp = 100f;
+    public float temp = 100f;
 
-    public float envPull = 0.08f; // How strongly is the players internal temp pulled towards the env temp (higher = faster)
-    public float bodyPull = 0.02f; // How strongly does the body pull back toward target temp (higher = faster)
+    public float coldThreshold = 25f;
+    public float tempMin = 0f;
 
-    public float tooHot = 108f; //78 
-    public float tooCold = 88f; // 55
+    [SerializeField] private float tempDrainRate = 0.0f;  // how fast you lose temp in neutral conditions
+    [SerializeField] private float nightColdMultiplier = 1.5f;
+    // Can add more multipliers for maybe weather or biome
 
+    // 0 = no protection, 1 = full protection
     [Range(0f, 1f)]
-    public float tempResistance = 0.5f; // 0 = no resistance, 1 = complete resistance
-    // This is a placeholder as of now but will be good for like clothes and stuff later on
+    public float coldResistance = 0.0f;
 
     public bool isSprinting = false; // TO:DO connect this to the actual sprinting control
     public float sprintMult = 2f;
@@ -54,13 +56,25 @@ public class PlayerManager : MonoBehaviour
         if ( hud == null ) hud = FindFirstObjectByType<PlayerHUD>();
     }
 
-    void TemperatureDamageCheck( )
+    void ColdDamageCheck( )
     {
-        if ( internalTemp < tooCold || internalTemp > tooHot )
-        {
-            health -= healthDrainRateTemp * Time.deltaTime;
-            health = Mathf.Max(health, 0f);
-        }
+        if ( temp > coldThreshold ) return;
+
+        float dt = Time.deltaTime;
+
+        float severity = Mathf.InverseLerp(coldThreshold, tempMin, temp);
+        // severity = 0 at 25, 1 at 0
+
+        float damagePerSecond = healthDrainRateTemp * (1f + severity);
+        health -= damagePerSecond * dt;
+        health = Mathf.Max(health, 0f);
+    }
+
+    // Heat sources are very simple rn, just adds heat per second.
+    public void AddHeat( float heatPerSecond )
+    {
+        temp += heatPerSecond * Time.deltaTime;
+        temp = Mathf.Clamp(temp, tempMin, maxTemp);
     }
 
     void ThirstDrain( float sprintMult )
@@ -107,16 +121,19 @@ public class PlayerManager : MonoBehaviour
     }
 
 
-    void TempChange( )
+    void TempDrain( )
     {
         float dt = Time.deltaTime;
 
-        float actualEnvPull = envPull * (1f - tempResistance);
+        float nightMult = isNight ? nightColdMultiplier : 1f;
 
-        float envTerm = actualEnvPull * (envTemp - internalTemp);
-        float bodyTerm = bodyPull * (targetTemp - internalTemp);
+        // Clothes reduce how fast you get cold.
+        float resistanceMult = 1f - coldResistance; // 0 resistance => 1.0 drain, 1 resistance => 0 drain
 
-        internalTemp += (envTerm + bodyTerm) * dt;
+        float drainPerSecond = tempDrainRate * nightMult * resistanceMult;
+
+        temp -= drainPerSecond * dt;
+        temp = Mathf.Clamp(temp, tempMin, maxTemp);
     }
 
     void Update( )
@@ -124,8 +141,8 @@ public class PlayerManager : MonoBehaviour
         isSprinting = controller != null && controller.IsSprinting;
         float drainMult = isSprinting ? sprintMult : 1f;
 
-        TempChange();
-        TemperatureDamageCheck();
+        TempDrain();
+        ColdDamageCheck();
         ThirstDrain(drainMult);
         HungerDrain(drainMult);
 
@@ -135,11 +152,10 @@ public class PlayerManager : MonoBehaviour
         // Debug.Log("Hunger: " + hunger);
         if ( hud != null )
         {
-            hud.SetHunger(hunger, maxHunger, sprintThreshold);
-            hud.SetThirst(thirst, maxThirst, sprintThreshold);
+            hud.SetHunger(hunger, maxHunger);
+            hud.SetThirst(thirst, maxThirst);
             hud.SetHealth(health, maxHealth);
-            hud.SetTemperature(internalTemp, maxTemp);
-
+            hud.SetTemperature(temp, maxTemp);
         }
 
         if ( controller != null )
@@ -167,7 +183,7 @@ public class PlayerManager : MonoBehaviour
             thirst = tempThirst;
         }
 
-        hud.SetThirst(thirst, maxThirst, sprintThreshold);
+        hud.SetThirst(thirst, maxThirst);
         return true;
     }
 
@@ -192,7 +208,7 @@ public class PlayerManager : MonoBehaviour
             hunger += tempHunger;
         }
 
-        hud.SetHunger(hunger, maxHunger, sprintThreshold);
+        hud.SetHunger(hunger, maxHunger);
         return true;
     }
 }
