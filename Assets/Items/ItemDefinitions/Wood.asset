@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e00bb45fc057dc746852dfddd20611b7, type: 3}
-  m_Name: Log
+  m_Name: Wood
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   ItemId: wood
   MaxStack: 20

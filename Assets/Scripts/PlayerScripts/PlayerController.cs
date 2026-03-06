@@ -49,9 +49,10 @@ public class SimpleFpsController : MonoBehaviour
 
     private bool inventoryOpen;
     private bool craftingOpen;
+    private bool smelterOpen;
 
 
-    private bool UiBlocked => inventoryOpen || craftingOpen || (devConsole != null && devConsole.IsOpen);
+    private bool UiBlocked => inventoryOpen || craftingOpen || smelterOpen || (devConsole != null && devConsole.IsOpen);
 
     private bool sprintAllowed = true;
 
@@ -152,7 +153,38 @@ public class SimpleFpsController : MonoBehaviour
             QueryTriggerInteraction.Ignore
         );
     }
+    private void SetSmelterOpen(bool open)
+    {
+        smelterOpen = open;
 
+        if (crosshairUI != null)
+            crosshairUI.SetVisible(!(inventoryOpen || craftingOpen || smelterOpen));
+
+        if (interactor != null)
+            interactor.enabled = !(inventoryOpen || craftingOpen || smelterOpen);
+
+        if (inventoryOpen || craftingOpen || smelterOpen)
+        {
+            moveInput = Vector2.zero;
+            lookDelta = Vector2.zero;
+            sprintHeld = false;
+            jumpQueued = false;
+
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            if (devConsole == null || !devConsole.IsOpen)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+
+        if (inventoryUI != null)
+            inventoryUI.SetSmelterOpen(smelterOpen);
+    }
     private void SetInventoryOpen( bool open )
     {
         inventoryOpen = open;
@@ -221,19 +253,8 @@ public class SimpleFpsController : MonoBehaviour
             inventoryUI.SetCraftingOpen(craftingOpen);
     }
 
-    public void OnCrafting( InputValue value )
-    {
-        if ( !value.isPressed ) return;
-        if ( devConsole != null && devConsole.IsOpen ) return;
-
-        // If inventory is open, close it first (optional)
-        if ( inventoryOpen ) SetInventoryOpen(false);
-
-        SetCraftingOpen(!craftingOpen);
-    }
-
-
     // --- Input System (PlayerInput: Send Messages) ---
+    
     public void OnMove( InputValue value )
     {
         if ( UiBlocked ) { moveInput = Vector2.zero; return; }
@@ -258,13 +279,6 @@ public class SimpleFpsController : MonoBehaviour
         if ( value.isPressed ) jumpQueued = true;
     }
 
-    public void OnInventory( InputValue value )
-    {
-        if ( !value.isPressed ) return;
-        if ( devConsole != null && devConsole.IsOpen ) return; // block tab while console open
-        if ( craftingOpen ) return;
-        SetInventoryOpen(!inventoryOpen);
-    }
     private void StepHotbar( int delta )
     {
         if ( playerInventory == null || playerInventory.Model == null || playerInventory.Model.Hotbar == null )
@@ -298,7 +312,7 @@ public class SimpleFpsController : MonoBehaviour
     // Mouse scroll is a Vector2 (x,y). We care about y.
     public void OnHotbarScroll( InputValue v )
     {
-        if ( inventoryOpen ) return;
+        if (inventoryOpen || craftingOpen || smelterOpen) return;
 
         Vector2 scroll = v.Get<Vector2>();
         if ( Mathf.Abs(scroll.y) < 0.01f ) return;
@@ -307,6 +321,72 @@ public class SimpleFpsController : MonoBehaviour
         StepHotbar(scroll.y > 0f ? -1 : +1);
     }
 
+    public void OnEscape(InputValue value)
+    {
+        if (!value.isPressed) return;
+        if (devConsole != null && devConsole.IsOpen) return; // keep your existing console behavior
+
+        CloseAllMenus();
+    }
+
+    public void OnInventory(InputValue value)
+    {
+        if (!value.isPressed) return;
+        if (devConsole != null && devConsole.IsOpen) return;
+
+        SetMenu(MenuType.Inventory);
+    }
+
+    public void OnCrafting(InputValue value)
+    {
+        if (!value.isPressed) return;
+        if (devConsole != null && devConsole.IsOpen) return;
+
+        SetMenu(MenuType.Crafting);
+    }
+
+    public void OnSmelter(InputValue value)
+    {
+        if (!value.isPressed) return;
+        if (devConsole != null && devConsole.IsOpen) return;
+
+        SetMenu(MenuType.Smelter);
+    }
+
+    // --- Menu switching helpers ---
+    private enum MenuType { None, Inventory, Crafting, Smelter }
+
+    private void SetMenu(MenuType target)
+    {
+        // If you press the key for the menu that’s already open -> close everything.
+        bool alreadyOpen =
+            (target == MenuType.Inventory && inventoryOpen) ||
+            (target == MenuType.Crafting && craftingOpen) ||
+            (target == MenuType.Smelter && smelterOpen);
+
+        if (alreadyOpen)
+            target = MenuType.None;
+
+        // Close everything first
+        if (inventoryOpen) SetInventoryOpen(false);
+        if (craftingOpen) SetCraftingOpen(false);
+        if (smelterOpen) SetSmelterOpen(false);
+
+        // Then open the requested menu
+        if (target == MenuType.Inventory) SetInventoryOpen(true);
+        else if (target == MenuType.Crafting) SetCraftingOpen(true);
+        else if (target == MenuType.Smelter) SetSmelterOpen(true);
+    }
+
+    private void CloseAllMenus()
+    {
+        if (inventoryOpen) SetInventoryOpen(false);
+        if (craftingOpen) SetCraftingOpen(false);
+        if (smelterOpen) SetSmelterOpen(false);
+    }
+
+
+    //----------------
 
 
     // Hotbar selection (bind these to 1..0 in Input Actions)

@@ -25,6 +25,22 @@ public sealed class InventoryUITKView : MonoBehaviour
     [Header("Crafting")]
     [SerializeField] private CraftingRecipeDatabase craftingDb;
 
+    [Header("Smelter")]
+    [SerializeField] private SmelterComponent smelter;
+
+    private bool smelterOpen;
+    private VisualElement smelterOverlay;
+
+    private SlotView[] smelterBackpackViews; // left grid, like crafting menu
+    private SlotView smelterOreView;
+    private SlotView smelterFuelView;
+    private SlotView smelterOutputView;
+
+    private Label smeltStackTimeLabel;
+    private Label fuelTimeLabel;
+
+    public bool IsSmelterOpen => smelterOpen;
+
     private struct RecipeStub
     {
         public string Name;
@@ -33,7 +49,7 @@ public sealed class InventoryUITKView : MonoBehaviour
     }
 
 
-    private bool IsAnyMenuOpen => backpackOpen || craftingOpen;
+    private bool IsAnyMenuOpen => backpackOpen || craftingOpen || smelterOpen;
 
     // Crafting overlay
     private bool craftingOpen;
@@ -121,6 +137,7 @@ public sealed class InventoryUITKView : MonoBehaviour
         if (craftingDb == null) craftingDb = FindFirstObjectByType<CraftingRecipeDatabase>();
         if (uiDocument == null) uiDocument = GetComponent<UIDocument>();
         if (playerInventory == null) playerInventory = FindFirstObjectByType<PlayerInventoryComponent>();
+        if (smelter == null) smelter = FindFirstObjectByType<SmelterComponent>();
     }
 
     private void OnEnable()
@@ -134,6 +151,7 @@ public sealed class InventoryUITKView : MonoBehaviour
         UnhookModelEvents();
         built = false;
         triedBuildThisFrame = false;
+
     }
 
     private void Update()
@@ -153,6 +171,25 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         if (!IsAnyMenuOpen) return;
         UpdateCursorVisual();
+        if (smelterOpen) RefreshSmelterStatusText();
+    }
+
+    public void SetSmelterOpen(bool open)
+    {
+        smelterOpen = open;
+
+        if (!built) return;
+
+        if (smelterOverlay != null)
+            smelterOverlay.style.display = smelterOpen ? DisplayStyle.Flex : DisplayStyle.None;
+
+        // Hide crosshair whenever ANY UI is open
+        SetCrosshairVisible(!(backpackOpen || craftingOpen || smelterOpen));
+
+        if (!smelterOpen && playerInventory != null && playerInventory.Model != null)
+            InventoryRules.CancelCursorToOrigin(playerInventory.Model.Cursor);
+
+        RefreshAll();
     }
 
     public void SetBackpackOpen(bool open)
@@ -204,6 +241,12 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         playerInventory.InventoryChanged += RefreshAll;
         playerInventory.HotbarSelectionChanged += OnHotbarSelectionChanged;
+
+        if (smelter != null)
+        {
+            smelter.SmelterChanged -= RefreshAll;
+            smelter.SmelterChanged += RefreshAll;
+        }
     }
 
     private void UnhookModelEvents()
@@ -211,6 +254,8 @@ public sealed class InventoryUITKView : MonoBehaviour
         if (playerInventory == null) return;
         playerInventory.InventoryChanged -= RefreshAll;
         playerInventory.HotbarSelectionChanged -= OnHotbarSelectionChanged;
+        if (smelter != null)
+            smelter.SmelterChanged -= RefreshAll;
     }
 
     private void OnHotbarSelectionChanged(int _) => RefreshHotbarSelection();
@@ -232,6 +277,7 @@ public sealed class InventoryUITKView : MonoBehaviour
         
         BuildBackpackOverlay();
         BuildCraftingOverlay();
+        BuildSmelterOverlay();
         BuildHotbarHud();
         BuildCursorVisual();
         BuildCrosshairHud();  
@@ -244,7 +290,251 @@ public sealed class InventoryUITKView : MonoBehaviour
         SetCrosshairVisible(!backpackOpen);
         SetCrosshairDefault();
     }
+    //---------------------------------- START OF SMELTER -----------------------------------
 
+    private void BuildSmelterOverlay()
+    {
+        if (playerInventory == null || playerInventory.Model == null) return;
+        if (smelter == null || smelter.Container == null) return;
+
+        var model = playerInventory.Model;
+
+        smelterOverlay = new VisualElement();
+        smelterOverlay.style.position = Position.Absolute;
+        smelterOverlay.style.left = 0;
+        smelterOverlay.style.top = 0;
+        smelterOverlay.style.right = 0;
+        smelterOverlay.style.bottom = 0;
+        smelterOverlay.style.backgroundColor = new Color(0, 0, 0, 0.55f);
+        smelterOverlay.style.justifyContent = Justify.Center;
+        smelterOverlay.style.alignItems = Align.Center;
+
+        root.Add(smelterOverlay);
+
+        // Main panel container (centered)
+        var panel = MakePanel(); // IMPORTANT: this gives "inventory-panel" class used by anti-drop logic
+        panel.style.width = 860;
+        panel.style.height = 520;              // was 420 (gives the grid proper bottom breathing room)
+        panel.style.justifyContent = Justify.Center;
+        panel.style.alignItems = Align.Center;
+        panel.style.paddingTop = 24;           // a bit more breathing room
+        panel.style.paddingBottom = 28;
+
+        smelterOverlay.Add(panel);
+
+        var row = new VisualElement();
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.alignItems = Align.Center;   // keeps both panels centered vertically within the main panel
+        row.style.justifyContent = Justify.Center;
+        panel.Add(row);
+
+        // ---------- LEFT: Backpack grid (same as crafting menu style 5x6) ----------
+        var leftPanel = MakePanel();
+        leftPanel.style.width = 340;
+        leftPanel.style.height = 440;
+        leftPanel.style.marginRight = 18;
+        leftPanel.RegisterCallback<PointerUpEvent>(OnPanelPointerUp, TrickleDown.TrickleDown);
+        row.Add(leftPanel);
+
+        var grid = new VisualElement();
+        grid.style.flexDirection = FlexDirection.Row;
+        grid.style.flexWrap = Wrap.Wrap;
+
+        int cols = 5;
+        int rows = 6;
+        float gridWidth = cols * slotSize.x + (cols - 1) * slotSpacing;
+        grid.style.width = gridWidth;
+
+        leftPanel.Add(grid);
+
+        int slotsToShow = Mathf.Min(cols * rows, model.Backpack.SlotCount);
+        smelterBackpackViews = new SlotView[slotsToShow];
+
+        for (int i = 0; i < slotsToShow; i++)
+        {
+            bool isLastInRow = ((i + 1) % cols) == 0;
+            var v = CreateSlotView(model.Backpack, i, allowClicks: true, isLastInRow: isLastInRow);
+            smelterBackpackViews[i] = v;
+            grid.Add(v.Root);
+        }
+
+        // ---------- RIGHT: Smelter panel ----------
+        var rightPanel = MakePanel();
+        rightPanel.style.width = 420;
+        rightPanel.style.height = 440;         // was 360
+        rightPanel.style.alignItems = Align.Center;
+        rightPanel.style.justifyContent = Justify.Center;   // THIS is what moves the smelter UI down into the middle
+        rightPanel.RegisterCallback<PointerUpEvent>(OnPanelPointerUp, TrickleDown.TrickleDown);
+        row.Add(rightPanel);
+
+        // Top row: Ore [ ]  ->  Output [ ]
+        var topRow = new VisualElement();
+        topRow.style.flexDirection = FlexDirection.Row;
+        topRow.style.alignItems = Align.Center;
+        topRow.style.justifyContent = Justify.Center;
+        topRow.style.marginTop = 0;
+        rightPanel.Add(topRow);
+
+        // Ore slot (filtered)
+        smelterOreView = CreateSlotView(smelter.Container, SmelterComponent.OreSlot, allowClicks: false, isLastInRow: false);
+        smelterOreView.Root.RegisterCallback<PointerDownEvent>(evt => OnSmelterSlotPointerDown(evt, smelterOreView, SmelterSlotType.Ore));
+        topRow.Add(smelterOreView.Root);
+
+        // ASCII arrow to avoid weird unicode
+        var arrow = new Label("->");
+        arrow.style.fontSize = 30;
+        arrow.style.unityTextAlign = TextAnchor.MiddleCenter;
+        arrow.style.marginLeft = 14;
+        arrow.style.marginRight = 14;
+        arrow.style.color = new Color(0.9f, 0.9f, 0.2f, 1f);
+        topRow.Add(arrow);
+
+        // Output slot (read-only for incoming)
+        smelterOutputView = CreateSlotView(smelter.Container, SmelterComponent.OutputSlot, allowClicks: false, isLastInRow: true);
+        smelterOutputView.Root.RegisterCallback<PointerDownEvent>(evt => OnSmelterSlotPointerDown(evt, smelterOutputView, SmelterSlotType.Output));
+        topRow.Add(smelterOutputView.Root);
+
+        // Stack timer label
+        smeltStackTimeLabel = new Label("Time till stack is smelted: 00:00");
+        smeltStackTimeLabel.style.marginTop = 14;
+        smeltStackTimeLabel.style.color = Color.white;
+        smeltStackTimeLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        rightPanel.Add(smeltStackTimeLabel);
+
+        // Fuel slot centered
+        var fuelRow = new VisualElement();
+        fuelRow.style.flexDirection = FlexDirection.Row;
+        fuelRow.style.alignItems = Align.Center;
+        fuelRow.style.justifyContent = Justify.Center;
+        fuelRow.style.marginTop = 20;
+        rightPanel.Add(fuelRow);
+
+        smelterFuelView = CreateSlotView(smelter.Container, SmelterComponent.FuelSlot, allowClicks: false, isLastInRow: true);
+        smelterFuelView.Root.RegisterCallback<PointerDownEvent>(evt => OnSmelterSlotPointerDown(evt, smelterFuelView, SmelterSlotType.Fuel));
+        fuelRow.Add(smelterFuelView.Root);
+
+        fuelTimeLabel = new Label("Time left on fuel: 00:00");
+        fuelTimeLabel.style.marginTop = 14;
+        fuelTimeLabel.style.color = Color.white;
+        fuelTimeLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        rightPanel.Add(fuelTimeLabel);
+
+        smelterOverlay.style.display = smelterOpen ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    private void OnSmelterSlotPointerDown(PointerDownEvent evt, SlotView view, SmelterSlotType type)
+    {
+        if (!IsAnyMenuOpen) return;
+        if (!smelterOpen) return;
+
+        if (playerInventory == null || playerInventory.Model == null) return;
+
+        var cursor = playerInventory.Model.Cursor;
+
+        bool changed = false;
+
+        bool cursorHasItem = cursor != null && cursor.HasItem;
+        ItemDefinition heldItem = cursorHasItem ? cursor.CursorStack.Item : null;
+
+        bool CanAcceptHeldIntoThisSlot()
+        {
+            if (!cursorHasItem || heldItem == null) return false;
+            if (type == SmelterSlotType.Output) return false;
+
+            if (type == SmelterSlotType.Ore)
+                return heldItem.IsOre && heldItem.SmeltResult != null && heldItem.SmeltSecondsPerItem > 0f;
+
+            if (type == SmelterSlotType.Fuel)
+                return heldItem.IsFuel && heldItem.FuelSeconds > 0f;
+
+            return false;
+        }
+
+        // LEFT CLICK
+        if (evt.button == (int)MouseButton.LeftMouse)
+        {
+            if (!cursorHasItem)
+            {
+                // Pick up full stack from that slot
+                changed = InventoryRules.TryPickUpStack(cursor, view.Container, view.Index);
+            }
+            else
+            {
+                // Drop/merge rules BUT filtered + output is read-only for incoming
+                if (!CanAcceptHeldIntoThisSlot())
+                    return;
+
+                changed = InventoryRules.TryDropCursorStack(cursor, view.Container, view.Index);
+            }
+        }
+        // RIGHT CLICK
+        else if (evt.button == (int)MouseButton.RightMouse)
+        {
+            if (type == SmelterSlotType.Output)
+            {
+                // Output slot: no placing. Right-click behaves like pickup (no “split to backpack”).
+                if (!cursorHasItem)
+                    changed = InventoryRules.TryPickUpStack(cursor, view.Container, view.Index);
+                else
+                    return;
+            }
+            else
+            {
+                if (!cursorHasItem)
+                {
+                    // Keep consistent with inventory: right-click splits stack to backpack.
+                    changed = InventoryRules.TrySplitStackToBackpack(view.Container, view.Index, playerInventory.Model.Backpack);
+                }
+                else
+                {
+                    if (!CanAcceptHeldIntoThisSlot())
+                        return;
+
+                    changed = InventoryRules.TryPlaceOneFromCursor(cursor, view.Container, view.Index);
+                }
+            }
+        }
+
+        if (changed)
+        {
+            playerInventory.NotifyInventoryChanged();
+            smelter.NotifyChanged();
+            evt.StopPropagation();
+        }
+    }
+
+    private void RefreshSmelterStatusText()
+    {
+        if (!built || !smelterOpen || smelter == null) return;
+
+        // Smelt countdown (per item)
+        if (smelter.TryGetCurrentSmeltTimes(out float perItem, out float remainingThisItem))
+        {
+            smeltStackTimeLabel.text =
+                $"Smelting: {FormatMMSS(remainingThisItem)}   (per item: {FormatMMSS(perItem)})";
+        }
+        else
+        {
+            smeltStackTimeLabel.text = "Smelting: 00:00   (per item: 00:00)";
+        }
+
+        // Fuel countdown: show remaining burn time currently loaded + fuel stack total time
+        float fuelTotal = smelter.GetTotalFuelTimeSeconds();
+        fuelTimeLabel.text = $"Fuel time left: {FormatMMSS(fuelTotal)}";
+    }
+
+    private static string FormatMMSS(float seconds)
+    {
+        seconds = Mathf.Max(0f, seconds);
+        int total = Mathf.FloorToInt(seconds);
+        int mm = total / 60;
+        int ss = total % 60;
+        return $"{mm:00}:{ss:00}";
+    }
+
+    private enum SmelterSlotType { Ore, Fuel, Output }
+
+    //---------------------------------- END OF SMELTER -----------------------------------
 
     private void BuildCraftingOverlay()
     {
@@ -563,7 +853,7 @@ public sealed class InventoryUITKView : MonoBehaviour
             craftingOverlay.style.display = craftingOpen ? DisplayStyle.Flex : DisplayStyle.None;
 
         // Hide crosshair whenever ANY UI is open
-        SetCrosshairVisible(!(backpackOpen || craftingOpen));
+        SetCrosshairVisible(!(backpackOpen || craftingOpen || smelterOpen));
 
         // If closing crafting, return cursor item like inventory does
         if (!craftingOpen && playerInventory != null && playerInventory.Model != null)
@@ -934,6 +1224,16 @@ public sealed class InventoryUITKView : MonoBehaviour
                 if (craftingViews[i].IsValid)
                     RefreshSlot(craftingViews[i]);
 
+        // Refresh smelter storage slots (ore/fuel/output)
+        if (smelterOreView.IsValid) RefreshSlot(smelterOreView);
+        if (smelterFuelView.IsValid) RefreshSlot(smelterFuelView);
+        if (smelterOutputView.IsValid) RefreshSlot(smelterOutputView);
+
+        // Refresh smelter backpack grid (left panel)
+        if (smelterBackpackViews != null)
+            for (int i = 0; i < smelterBackpackViews.Length; i++)
+                if (smelterBackpackViews[i].IsValid)
+                    RefreshSlot(smelterBackpackViews[i]);
 
         RefreshHotbarSelection();
         UpdateCursorVisual(force: true);
