@@ -16,3 +16,13 @@ MonoBehaviour:
   MaxStack: 5
   Icon: {fileID: 0}
   WorldPrefab: {fileID: 0}
+  DestroyOnUse: 0
+  IsFood: 0
+  FoodValue: 0
+  IsWater: 0
+  WaterValue: 0
+  IsOre: 0
+  SmeltResult: {fileID: 0}
+  SmeltSecondsPerItem: 5
+  IsFuel: 0
+  FuelSeconds: 10
