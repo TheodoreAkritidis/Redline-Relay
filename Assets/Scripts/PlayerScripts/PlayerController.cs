@@ -35,6 +35,10 @@ public class SimpleFpsController : MonoBehaviour
     [SerializeField] private CrosshairUITK crosshairUI;     // assign HUD object
     [SerializeField] private Interactor interactor;   // assign (optional but recommended)
 
+    [Header("SoundEffects")]
+    [SerializeField] private AudioSource jumpSound;   
+   
+
 
     private GUIStyle speedStyle;
     private Rigidbody rb;
@@ -134,6 +138,8 @@ public class SimpleFpsController : MonoBehaviour
 
             if ( grounded )
             {
+                if ( jumpSound != null )
+                    jumpSound.Play();
                 if ( rb.linearVelocity.y < 0f )
                     rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
