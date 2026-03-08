@@ -24693,6 +24693,7 @@ MonoBehaviour:
   showSpeedDebug: 1
   crosshairUI: {fileID: 0}
   interactor: {fileID: 0}
+  jumpSound: {fileID: 0}
 --- !u!114 &1230745125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24898,7 +24899,7 @@ MonoBehaviour:
   groundRayDown: 2
   groundMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 64
 --- !u!114 &1230745136
 MonoBehaviour:
   m_ObjectHideFlags: 0
