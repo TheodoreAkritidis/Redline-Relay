@@ -3,8 +3,8 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     [Header("Enemy Reference")]
-    [SerializeField] float enemyWanderSpeed = 50f;
-    [SerializeField] float enemyChaseSpeed = 20f;
+    [SerializeField] float enemyWanderSpeed = 20f;
+    [SerializeField] float enemyChaseSpeed = 15f;
     [SerializeField] float stopDistance = 2f;
     public float direction = 1f;
     public float wanderRadius = 20f;
@@ -23,13 +23,6 @@ public class EnemyController : MonoBehaviour
 
     private float attackTimer = 0f;
     private PlayerManager playerManager;
-
-    //[Header("Spawn Area Bounds")] 
-    //public float areaBoundMinX = 600f; 
-    //public float areaBoundMaxX = 700f; 
-    //public float areaBoundMinZ = 490f; 
-    //public float areaBoundMaxZ = 570f; 
-    //public float areaBoundY = 1f;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -98,7 +91,6 @@ public class EnemyController : MonoBehaviour
             }
 
             attackTimer = attackCooldown;
-            //RespawnEnemy();
         }
     }
 
@@ -134,26 +126,5 @@ public class EnemyController : MonoBehaviour
             ChooseTarget();
         }
     }
-
-    //void RespawnEnemy() 
-    //{ 
-    //    Vector3 spawnPosition; 
-    //    int spawnAttempts = 0; 
-
-    //    do 
-    //    { 
-    //        float randomPosX = Random.Range(areaBoundMinX, areaBoundMaxX); 
-    //        float randomPosZ = Random.Range(areaBoundMinZ, areaBoundMaxZ); 
-
-    //        spawnPosition = new Vector3(randomPosX, areaBoundY, randomPosZ); 
-    //        spawnAttempts++; 
-    //    } while (
-    //        Vector3.Distance(spawnPosition, player.position) < detectionRadius * 2 && spawnAttempts < 50
-    //    ); 
-
-    //    transform.position = spawnPosition;
-
-    //    ChooseTarget();
-    //}
   
 }
