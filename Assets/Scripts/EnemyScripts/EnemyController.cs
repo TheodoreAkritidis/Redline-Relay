@@ -16,9 +16,33 @@ public class EnemyController : MonoBehaviour
     private Vector3 wanderTarget;
     private bool playerDetected = false;
 
+    [Header("Attack")]
+    public float attackRange = 2f;
+    public float attackDamage = 10f;
+    public float attackCooldown = 1f;
+
+    private float attackTimer = 0f;
+    private PlayerManager playerManager;
+
+    //[Header("Spawn Area Bounds")] 
+    //public float areaBoundMinX = 600f; 
+    //public float areaBoundMaxX = 700f; 
+    //public float areaBoundMinZ = 490f; 
+    //public float areaBoundMaxZ = 570f; 
+    //public float areaBoundY = 1f;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // Allows the enemy to automatically find the player
+        if (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        }
+
+        playerManager = player.GetComponent<PlayerManager>();
+
         ChooseTarget();
     }
 
@@ -32,23 +56,23 @@ public class EnemyController : MonoBehaviour
         if (distanceToPlayer <= detectionRadius)
         {
             playerDetected = true;
-        } else if (distanceToPlayer > detectionRadius)
-        {
+        } else {
             playerDetected = false;
         }
 
         if (playerDetected)
         {
-            ChasePlayer();
-        } else
-        {
+            if (distanceToPlayer <= attackRange)
+            {
+                AttackPlayer();
+            } else {
+                ChasePlayer();
+            }
+        } else {
             Wander();
         }
 
-        //Vector3 direction = (player.position - transform.position).normalized;
-        
-        //transform.position += direction * enemySpeed * Time.deltaTime;
-        //transform.LookAt(player);
+        attackTimer -= Time.deltaTime;
     }
 
     void ChooseTarget()
@@ -56,6 +80,26 @@ public class EnemyController : MonoBehaviour
         Vector3 randomDir = Random.insideUnitSphere * wanderRadius;
         randomDir.y = 0;
         wanderTarget = transform.position + randomDir;
+    }
+
+    void AttackPlayer()
+    {
+        Vector3 directionToPlayer = (player.position - transform.position);
+        directionToPlayer.y = 0;
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(directionToPlayer), 0.2f);
+
+        if (attackTimer <= 0f)
+        {
+            if (playerManager != null)
+            {
+                playerManager.health -= attackDamage;
+                Debug.Log($"Enemy attacked player! Player health: {playerManager.health}");
+            }
+
+            attackTimer = attackCooldown;
+            //RespawnEnemy();
+        }
     }
 
     void ChasePlayer()
@@ -91,4 +135,25 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    //void RespawnEnemy() 
+    //{ 
+    //    Vector3 spawnPosition; 
+    //    int spawnAttempts = 0; 
+
+    //    do 
+    //    { 
+    //        float randomPosX = Random.Range(areaBoundMinX, areaBoundMaxX); 
+    //        float randomPosZ = Random.Range(areaBoundMinZ, areaBoundMaxZ); 
+
+    //        spawnPosition = new Vector3(randomPosX, areaBoundY, randomPosZ); 
+    //        spawnAttempts++; 
+    //    } while (
+    //        Vector3.Distance(spawnPosition, player.position) < detectionRadius * 2 && spawnAttempts < 50
+    //    ); 
+
+    //    transform.position = spawnPosition;
+
+    //    ChooseTarget();
+    //}
+  
 }
