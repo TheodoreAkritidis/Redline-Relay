@@ -459,6 +459,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7235721634452465456}
+  - component: {fileID: -4311023143268694782}
   m_Layer: 8
   m_Name: Copper Ore
   m_TagString: Untagged
@@ -550,6 +551,26 @@ Transform:
   - {fileID: 6884375886617860246}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4311023143268694782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 271413880565636275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cffe2f87916ac074da06c9730252f914, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceNodeInteractable
+  dropItem: {fileID: 11400000, guid: 124125db09dd4fc478911a7ef6c65b19, type: 2}
+  dropAmount: 2
+  addDirectToInventory: 0
+  dropRemainderIfFull: 1
+  requiredTool: {fileID: 11400000, guid: 3f0dc44ff817b684a8f8ec0d587b850a, type: 2}
+  requiredToolNameOverride: Stone Pickaxe
+  verb: Mine
+  destroyOnHarvest: 1
 --- !u!1 &276016559143189092
 GameObject:
   m_ObjectHideFlags: 0

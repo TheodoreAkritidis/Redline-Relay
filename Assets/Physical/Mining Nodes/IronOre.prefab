@@ -727,11 +727,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNodeInteractable
   dropItem: {fileID: 11400000, guid: c2113a56e9b42cd42b02d2112ce138ae, type: 2}
-  dropAmount: 3
+  dropAmount: 2
   addDirectToInventory: 0
   dropRemainderIfFull: 1
-  requiredTool: {fileID: 11400000, guid: 3f0dc44ff817b684a8f8ec0d587b850a, type: 2}
-  requiredToolNameOverride: Stone Pickaxe
+  requiredTool: {fileID: 11400000, guid: 9a3493e6b00ddd94b97f8ce94a74b986, type: 2}
+  requiredToolNameOverride: Copper Pickaxe
   verb: Mine
   destroyOnHarvest: 1
 --- !u!1 &1785124189860790895

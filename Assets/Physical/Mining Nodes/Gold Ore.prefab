@@ -459,6 +459,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7235721634452465456}
+  - component: {fileID: 6885443727109632371}
   m_Layer: 8
   m_Name: Gold Ore
   m_TagString: Untagged
@@ -550,6 +551,26 @@ Transform:
   - {fileID: 6884375886617860246}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6885443727109632371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 271413880565636275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cffe2f87916ac074da06c9730252f914, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceNodeInteractable
+  dropItem: {fileID: 11400000, guid: d7006120a5edb9d47a854b9b29aa72cd, type: 2}
+  dropAmount: 2
+  addDirectToInventory: 0
+  dropRemainderIfFull: 1
+  requiredTool: {fileID: 11400000, guid: 957aa9b07fe591c4c9c3e8d1a416f8ec, type: 2}
+  requiredToolNameOverride: Iron Pickaxe
+  verb: Mine
+  destroyOnHarvest: 1
 --- !u!1 &276016559143189092
 GameObject:
   m_ObjectHideFlags: 0
