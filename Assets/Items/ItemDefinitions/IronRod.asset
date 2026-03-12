@@ -14,5 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   ItemId: iron_rod
   MaxStack: 10
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: fc999b57b01b5484b9ae7d71d98ca783, type: 3}
   WorldPrefab: {fileID: 0}
+  DestroyOnUse: 0
+  IsFood: 0
+  FoodValue: 0
+  IsWater: 0
+  WaterValue: 0
+  IsOre: 0
+  SmeltResult: {fileID: 0}
+  SmeltSecondsPerItem: 5
+  IsFuel: 0
+  FuelSeconds: 10
