@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2066754955675502646}
   - component: {fileID: 112236147209603152}
   - component: {fileID: 977555673297633416}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,3 +132,6 @@ MonoBehaviour:
   wanderRadius: 20
   player: {fileID: 0}
   detectionRadius: 20
+  attackRange: 2
+  attackDamage: 10
+  attackCooldown: 1

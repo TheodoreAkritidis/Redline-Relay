@@ -18,4 +18,8 @@ public sealed class ItemDefinition : ScriptableObject
     [Space(20)]
     public bool IsWater;
     public float WaterValue = 0;
+
+    [Header("Attack/Damage")]
+    public bool isWeapon;
+    public float WeaponValue = 0;
 }

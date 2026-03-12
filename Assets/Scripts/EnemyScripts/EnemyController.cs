@@ -8,6 +8,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] float stopDistance = 2f;
     public float direction = 1f;
     public float wanderRadius = 20f;
+    private Vector3 spawnPosition;
 
     [Header("Player Reference")]
     public Transform player;
@@ -18,8 +19,8 @@ public class EnemyController : MonoBehaviour
 
     [Header("Attack")]
     public float attackRange = 2f;
-    public float attackDamage = 10f;
-    public float attackCooldown = 1f;
+    public float attackDamage = 5f;
+    public float attackCooldown = 5f; // controls the amount of time before an enemy can attack again
 
     private float attackTimer = 0f;
     private PlayerManager playerManager;
@@ -37,6 +38,8 @@ public class EnemyController : MonoBehaviour
         playerManager = player.GetComponent<PlayerManager>();
 
         ChooseTarget();
+
+        spawnPosition = transform.position;
     }
 
     // Update is called once per frame
@@ -126,5 +129,16 @@ public class EnemyController : MonoBehaviour
             ChooseTarget();
         }
     }
-  
+
+    public void TakeDamage(float damage)
+    {
+        RespawnEnemy();
+    }
+
+    void RespawnEnemy()
+    {
+        transform.position = spawnPosition;
+        ChooseTarget();
+    }
+
 }

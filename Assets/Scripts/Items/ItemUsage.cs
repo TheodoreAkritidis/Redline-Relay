@@ -8,6 +8,9 @@ public class ItemUsage : MonoBehaviour
 
     public bool useBlocked = false;
 
+    [SerializeField] private float attackRange;
+    [SerializeField] private LayerMask enemyLayer;
+
     private void Awake()
     {
         if (inv == null)
@@ -46,10 +49,31 @@ public class ItemUsage : MonoBehaviour
             consumed = player.TryDrink(item.WaterValue);
         }
 
+        if (item.isWeapon)
+        {
+            Attack(item.WeaponValue);
+        }
+
         if (item.DestroyOnUse && consumed)
         {
             inv.ConsumeSelectedHotbarItem();
             inv.NotifyInventoryChanged();
+        }
+    }
+
+    private void Attack(float weaponDamage)
+    {
+        Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, attackRange, enemyLayer))
+        {
+            EnemyController enemy = hit.collider.GetComponent<EnemyController>();
+
+            if (enemy != null)
+            {
+                enemy.TakeDamage(weaponDamage);
+            }
         }
     }
 }
