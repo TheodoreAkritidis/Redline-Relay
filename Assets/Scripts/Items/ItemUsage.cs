@@ -26,11 +26,25 @@ public class ItemUsage : MonoBehaviour
 
     public void OnUse(InputValue v)
     {
-        if (useBlocked)
-        {
-            return;
-        }
+        // Only handle press events from the Input System
+        if (!v.isPressed) return;
+        DoUse();
+    }
 
+    private void Update()
+    {
+        // Support legacy input (mouse left button and Enter) in case Input System isn't
+        // sending messages or the player expects these keys to work.
+        if (useBlocked) return;
+
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            DoUse();
+        }
+    }
+
+    private void DoUse()
+    {
         ItemDefinition item = inv.GetSelectedHotbarItem();
         bool consumed = false;
 

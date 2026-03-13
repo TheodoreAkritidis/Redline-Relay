@@ -3,8 +3,8 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     [Header("Enemy Reference")]
-    [SerializeField] float enemyWanderSpeed = 20f;
-    [SerializeField] float enemyChaseSpeed = 15f;
+    [SerializeField] float enemyWanderSpeed = 5f;
+    [SerializeField] float enemyChaseSpeed = 5f;
     [SerializeField] float stopDistance = 2f;
     public float direction = 1f;
     public float wanderRadius = 20f;
@@ -132,6 +132,8 @@ public class EnemyController : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        Debug.Log($"Enemy took {damage} damage!");
+
         RespawnEnemy();
     }
 

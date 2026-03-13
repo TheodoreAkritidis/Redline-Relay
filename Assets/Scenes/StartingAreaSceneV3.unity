@@ -6473,6 +6473,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube (9)
@@ -17023,6 +17039,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube (4)
@@ -19737,6 +19769,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube (1)
@@ -23776,6 +23824,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube (6)
@@ -26443,6 +26507,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube (2)
@@ -27880,6 +27960,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube (7)
@@ -29007,6 +29103,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube (5)
@@ -30806,6 +30918,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube (3)
@@ -31988,6 +32116,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube (8)
@@ -34905,6 +35049,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1230745123}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: attackCooldown
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyChaseSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 977555673297633416, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
+      propertyPath: enemyWanderSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8163442579875628660, guid: bb6f27d5c5a7242439922a1ff03d0a2d, type: 3}
       propertyPath: m_Name
       value: Cube

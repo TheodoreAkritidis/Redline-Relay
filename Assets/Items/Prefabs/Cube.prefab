@@ -125,13 +125,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3d9d48ef9ffd9b4e968a3e71a311cd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  enemyWanderSpeed: 50
-  enemyChaseSpeed: 20
+  enemyWanderSpeed: 5
+  enemyChaseSpeed: 5
   stopDistance: 2
   direction: 1
   wanderRadius: 20
   player: {fileID: 0}
   detectionRadius: 20
   attackRange: 2
-  attackDamage: 10
-  attackCooldown: 1
+  attackDamage: 5
+  attackCooldown: 5
