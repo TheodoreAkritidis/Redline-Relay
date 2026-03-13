@@ -46,6 +46,11 @@ public class ItemUsage : MonoBehaviour
             consumed = player.TryDrink(item.WaterValue);
         }
 
+        if (item.AppliesStatus)
+        {
+            player.TryApplyStatus(item.Status);
+        }
+
         if (item.DestroyOnUse && consumed)
         {
             inv.ConsumeSelectedHotbarItem();

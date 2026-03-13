@@ -15,7 +15,9 @@ public sealed class ItemDefinition : ScriptableObject
 
     [Space(10)]
     public bool IsFood;
+    public bool AppliesStatus;
     public float FoodValue = 0;
+    public string Status = "None";
 
     [Space(20)]
     public bool IsWater;
