@@ -27,7 +27,14 @@ public sealed class MenuFlowController : MonoBehaviour
     [SerializeField] private string quitButtonName = "QuitButton";
     [SerializeField] private string resumeButtonName = "ResumeButton";
     [SerializeField] private string pauseQuitButtonName = "PauseQuitButton";
+    [SerializeField] private string victoryRestartButtonName = "RestartButton";
     [SerializeField] private string victoryQuitButtonName = "VictoryQuitButton";
+
+    [Header("Victory UI")]
+    [SerializeField] private string victoryTimeLabelName = "contactTimeLabel";
+
+    [Header("Audio")]
+    [SerializeField] private BackgroundMusic backgroundMusic;
 
     private VisualElement root;
     private VisualElement mainMenuRoot;
@@ -38,9 +45,16 @@ public sealed class MenuFlowController : MonoBehaviour
     private Button quitButton;
     private Button resumeButton;
     private Button pauseQuitButton;
+    private Button victoryRestartButton;
     private Button victoryQuitButton;
 
+    private Label victoryTimeLabel;
+
+
+    private static bool forceStartPlayingOnNextLoad;
     private MenuState currentState;
+
+    private float runTimerSeconds;
 
     private void Awake()
     {
@@ -48,6 +62,7 @@ public sealed class MenuFlowController : MonoBehaviour
         if (playerController == null) playerController = FindFirstObjectByType<SimpleFpsController>();
         if (inventoryUI == null) inventoryUI = FindFirstObjectByType<InventoryUITKView>();
         if (interactor == null) interactor = FindFirstObjectByType<Interactor>();
+        if (backgroundMusic == null) backgroundMusic = FindFirstObjectByType<BackgroundMusic>();
     }
 
     private void OnEnable()
@@ -67,15 +82,21 @@ public sealed class MenuFlowController : MonoBehaviour
         resumeButton = pauseMenuRoot != null ? pauseMenuRoot.Q<Button>(resumeButtonName) : null;
         pauseQuitButton = pauseMenuRoot != null ? pauseMenuRoot.Q<Button>(pauseQuitButtonName) : null;
 
+        victoryRestartButton = victoryMenuRoot != null ? victoryMenuRoot.Q<Button>(victoryRestartButtonName) : null;
         victoryQuitButton = victoryMenuRoot != null ? victoryMenuRoot.Q<Button>(victoryQuitButtonName) : null;
+        victoryTimeLabel = victoryMenuRoot != null ? victoryMenuRoot.Q<Label>(victoryTimeLabelName) : null;
 
         if (playButton != null) playButton.clicked += OnPlayClicked;
         if (quitButton != null) quitButton.clicked += OnQuitClicked;
         if (resumeButton != null) resumeButton.clicked += OnResumeClicked;
         if (pauseQuitButton != null) pauseQuitButton.clicked += OnQuitToMainMenuClicked;
+        if (victoryRestartButton != null) victoryRestartButton.clicked += OnRestartClicked;
         if (victoryQuitButton != null) victoryQuitButton.clicked += OnQuitToMainMenuClicked;
 
-        SetState(startAtMainMenu ? MenuState.MainMenu : MenuState.Playing);
+        bool shouldStartPlaying = forceStartPlayingOnNextLoad || !startAtMainMenu;
+        forceStartPlayingOnNextLoad = false;
+
+        SetState(shouldStartPlaying ? MenuState.Playing : MenuState.MainMenu);
     }
 
     private void OnDisable()
@@ -84,11 +105,17 @@ public sealed class MenuFlowController : MonoBehaviour
         if (quitButton != null) quitButton.clicked -= OnQuitClicked;
         if (resumeButton != null) resumeButton.clicked -= OnResumeClicked;
         if (pauseQuitButton != null) pauseQuitButton.clicked -= OnQuitToMainMenuClicked;
+        if (victoryRestartButton != null) victoryRestartButton.clicked -= OnRestartClicked;
         if (victoryQuitButton != null) victoryQuitButton.clicked -= OnQuitToMainMenuClicked;
     }
 
     private void Update()
     {
+        if (currentState == MenuState.Playing)
+        {
+            runTimerSeconds += Time.unscaledDeltaTime;
+        }
+
         if (currentState == MenuState.MainMenu || currentState == MenuState.Victory)
             return;
 
@@ -107,6 +134,7 @@ public sealed class MenuFlowController : MonoBehaviour
     public void ShowVictory()
     {
         Debug.Log("Victory triggered.");
+        UpdateVictoryTimeText();
         SetState(MenuState.Victory);
     }
 
@@ -125,6 +153,11 @@ public sealed class MenuFlowController : MonoBehaviour
         SetState(MenuState.MainMenu);
     }
 
+    private void OnRestartClicked()
+    {
+        RestartCurrentScene();
+    }
+
     private void OnQuitClicked()
     {
 #if UNITY_EDITOR
@@ -134,8 +167,21 @@ public sealed class MenuFlowController : MonoBehaviour
 #endif
     }
 
+    private void RestartCurrentScene()
+    {
+        forceStartPlayingOnNextLoad = true;
+
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+        backgroundMusic?.StopAllMusic();
+
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.buildIndex);
+    }
+
     private void SetState(MenuState newState)
     {
+        MenuState previousState = currentState;
         currentState = newState;
 
         bool showMain = newState == MenuState.MainMenu;
@@ -160,6 +206,51 @@ public sealed class MenuFlowController : MonoBehaviour
         UnityEngine.Cursor.visible = !isPlaying;
 
         Time.timeScale = isPlaying ? 1f : 0f;
+
+        if (newState == MenuState.MainMenu)
+        {
+            AudioListener.pause = false;
+            backgroundMusic?.PlayMenuMusic();
+        }
+        else if (newState == MenuState.Playing)
+        {
+            AudioListener.pause = false;
+
+            if (previousState == MenuState.Paused)
+            {
+                backgroundMusic?.ResumeGameplayMusic();
+            }
+            else
+            {
+                runTimerSeconds = 0f;
+                backgroundMusic?.StartGameplayMusicFresh();
+            }
+        }
+        else if (newState == MenuState.Paused)
+        {
+            backgroundMusic?.PauseGameplayMusic();
+            AudioListener.pause = true;
+        }
+        else if (newState == MenuState.Victory)
+        {
+            AudioListener.pause = false;
+            backgroundMusic?.PlayVictoryMusic();
+            AudioListener.pause = true;
+        }
+    }
+
+    private void UpdateVictoryTimeText()
+    {
+        if (victoryTimeLabel == null) return;
+        victoryTimeLabel.text = $"Time till contact: {FormatTimer(runTimerSeconds)}";
+    }
+
+    private static string FormatTimer(float totalSeconds)
+    {
+        int seconds = Mathf.Max(0, Mathf.FloorToInt(totalSeconds));
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+        return $"{minutes:00}:{remainingSeconds:00}";
     }
 
     private void CloseGameplayMenus()

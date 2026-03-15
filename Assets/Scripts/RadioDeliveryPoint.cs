@@ -16,6 +16,9 @@ public sealed class RadioDeliveryPoint : MonoBehaviour, IInteractable
     [Header("Debug")]
     [SerializeField] private bool logIfMissingRadio = false;
 
+    [Header("Flow")]
+    [SerializeField] private MenuFlowController menuFlowController;
+
     private bool delivered;
     private PlayerInventoryComponent cachedPlayer;
 
@@ -32,6 +35,8 @@ public sealed class RadioDeliveryPoint : MonoBehaviour, IInteractable
 
         if (placedRadioVisual != null)
             placedRadioVisual.SetActive(false);
+        if (menuFlowController == null)
+            menuFlowController = FindFirstObjectByType<MenuFlowController>();
     }
 
     private void Update()
@@ -95,7 +100,14 @@ public sealed class RadioDeliveryPoint : MonoBehaviour, IInteractable
         if (placedRadioVisual != null)
             placedRadioVisual.SetActive(true);
 
-        Debug.Log("WIN PLACEHOLDER: Radio delivered successfully.");
+        if (menuFlowController != null)
+        {
+            menuFlowController.ShowVictory();
+        }
+        else
+        {
+            Debug.LogWarning("Radio delivered, but no MenuFlowController was found.");
+        }
     }
 
     private bool PlayerHasRadio(PlayerInventoryComponent playerInventory)
