@@ -360,6 +360,26 @@ public class SimpleFpsController : MonoBehaviour
     }
 
     // --- Menu switching helpers ---
+
+    public void OpenSmelterMenu()
+    {
+        if (devConsole != null && devConsole.IsOpen) return;
+        SetMenu(MenuType.Smelter);
+    }
+
+    public void OpenInventoryMenu()
+    {
+        if (devConsole != null && devConsole.IsOpen) return;
+        SetMenu(MenuType.Inventory);
+    }
+
+    public void OpenCraftingMenu()
+    {
+        if (devConsole != null && devConsole.IsOpen) return;
+        SetMenu(MenuType.Crafting);
+    }
+
+
     private enum MenuType { None, Inventory, Crafting, Smelter }
 
     private void SetMenu(MenuType target)
