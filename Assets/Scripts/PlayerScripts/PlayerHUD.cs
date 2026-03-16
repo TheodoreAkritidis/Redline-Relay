@@ -18,6 +18,22 @@ public class PlayerHUD : MonoBehaviour
     [Header("Temperature")]
     [SerializeField] private Image tempFill;
 
+    [Header("Statuses")]
+    [SerializeField] private StatusManager status;
+    [SerializeField] private GameObject poisonIcon;
+    [SerializeField] private GameObject healingIcon;
+
+    private void Awake( )
+    {
+        poisonIcon.SetActive(false);
+        healingIcon.SetActive(false);
+
+        if ( status == null )
+        {
+            status = FindFirstObjectByType<StatusManager>();
+        }
+    }
+
     public void SetHunger( float current, float max )
     {
         float normalized = (max <= 0f) ? 0f : Mathf.Clamp01(current / max);
@@ -46,5 +62,26 @@ public class PlayerHUD : MonoBehaviour
 
 
         tempFill.fillAmount = n;
+    }
+
+    public void SetActivePoisonIcon( )
+    {
+        status.SetNewStatusIcon(poisonIcon);
+    }
+
+    public void SetInactivePoisonIcon( )
+    {
+        status.RemoveStatusIcon(poisonIcon);
+
+    }
+
+    public void SetActiveHealingIcon( )
+    {
+        status.SetNewStatusIcon(healingIcon);
+    }
+
+    public void SetInactiveHealingIcon( )
+    {
+        status.RemoveStatusIcon(healingIcon);
     }
 }

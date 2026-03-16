@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class PlayerManager : MonoBehaviour
     [Header("Health")]
     public float maxHealth = 100f;
     public float health = 100f;
+    public float healingRate = 0f;
+    public float healthDrainRatePoison = 1f;
     public float healthDrainRateTemp = 0.01f;
     public float healthDrainRateHunger = 0.2f;
     public float healthDrainRateThirst = 0.2f;
@@ -49,6 +52,12 @@ public class PlayerManager : MonoBehaviour
     public bool CanSprint =>
        hunger > maxHunger * sprintThreshold
        && thirst > maxThirst * sprintThreshold;
+
+    // For status effects
+    public bool isHealing = false;
+    public bool isPoisoned = false;
+    public float healTimer = 0f;
+    public float poisonTimer = 0f;
 
     void Awake( )
     {
@@ -120,6 +129,14 @@ public class PlayerManager : MonoBehaviour
         health = Mathf.Max(health, 0f);
     }
 
+    void HealthRestore( )
+    {
+        if ( hunger >= maxHunger * 0.75)
+        {
+            health += healingRate * Time.deltaTime;
+        }
+    }
+
 
     void TempDrain( )
     {
@@ -147,7 +164,7 @@ public class PlayerManager : MonoBehaviour
         HungerDrain(drainMult);
 
         HealthDrain();
-
+        HealthRestore();
 
         // Debug.Log("Hunger: " + hunger);
         if ( hud != null )
@@ -210,5 +227,72 @@ public class PlayerManager : MonoBehaviour
 
         hud.SetHunger(hunger, maxHunger);
         return true;
+    }
+
+    public void TryApplyStatus( string status )
+    {
+        if ( string.Equals(status, "Healing") )
+        {
+            // Refresh healing duration if already healing
+            if ( isHealing )
+            {
+                Debug.Log("Refreshed Healing");
+                healTimer = 0f;
+            }
+            else
+            {
+                Debug.Log("Healing");
+                isHealing = true;
+                
+                StartCoroutine(HealingBuffTimer(10));
+            }
+        }
+
+        if ( string.Equals(status, "Poison") )
+        {    
+            // Refresh poison duration if already poisoned
+            if ( isPoisoned )
+            {
+                Debug.Log("Refreshed Poison");
+                poisonTimer = 0f;
+            }
+            else
+            {
+                Debug.Log("Poisoned");
+                isPoisoned = true;
+                hud.SetActivePoisonIcon();
+                StartCoroutine(PoisonDebuffTimer(8));
+            }
+        }
+    }
+
+    IEnumerator HealingBuffTimer( float seconds )
+    {
+        while ( isHealing && (healTimer <= seconds) )
+        {
+            healTimer += 1;
+
+            yield return new WaitForSeconds(1);
+        }
+
+        isHealing = false;
+        healTimer = 0f;
+        
+        Debug.Log("No Longer Healing");
+    }
+
+    IEnumerator PoisonDebuffTimer( float seconds )
+    {
+        while ( isPoisoned && (poisonTimer <= seconds) )
+        {
+            poisonTimer += 1;
+
+            yield return new WaitForSeconds(1);
+        }
+
+        isPoisoned = false;
+        poisonTimer = 0f;
+        hud.SetInactivePoisonIcon();
+        Debug.Log("No Longer Poisoned");
     }
 }

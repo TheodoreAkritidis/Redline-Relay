@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Items/Item Definition")]
-public sealed class ItemDefinition : ScriptableObject
+public class ItemDefinition : ScriptableObject
 {
     public string ItemId;
     public int MaxStack = 1;
@@ -37,4 +37,8 @@ public sealed class ItemDefinition : ScriptableObject
 
     [Tooltip("Seconds of burn time provided by ONE unit of this fuel item.")]
     public float FuelSeconds = 10f;
+
+    [Header("Status Effects")]
+    public bool AppliesStatus = false;
+    public string Status;
 }
