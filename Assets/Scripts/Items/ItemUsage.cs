@@ -129,9 +129,7 @@ public class ItemUsage : MonoBehaviour
         if (Physics.Raycast(ray, out hit, attackRange, enemyLayer, QueryTriggerInteraction.Collide))
         {
             Debug.Log($"ItemUsage.Attack: Attack hit '{hit.collider.name}' with damage={weaponDamage}");
-            // Support colliders placed on child objects of the enemy prefab
-            EnemyController enemy = hit.collider.GetComponent<EnemyController>() ?? hit.collider.GetComponentInParent<EnemyController>();
-
+            EnemyController enemy = hit.collider.GetComponent<EnemyController>() ?? hit.collider.GetComponentInParent<EnemyController>(); // supports colliders placed on child objects of the enemy prefab
             if (enemy != null)
             {
                 enemy.TakeDamage(weaponDamage);
@@ -139,7 +137,6 @@ public class ItemUsage : MonoBehaviour
         }
         else
         {
-            // Try a fallback raycast without layer mask in case enemyLayer was not set correctly
             if (Physics.Raycast(ray, out hit, attackRange))
             {
                 Debug.Log($"ItemUsage.Attack: Fallback hit '{hit.collider.name}' with damage={weaponDamage}");

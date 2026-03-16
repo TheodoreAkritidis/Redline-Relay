@@ -52,6 +52,7 @@ public class EnemyController : MonoBehaviour
 
         // Align spawn position to ground if possible
         Vector3 sampleOrigin = transform.position + Vector3.up * groundSampleHeight;
+
         RaycastHit groundHit;
         int groundMask = groundLayer.value == 0 ? ~0 : groundLayer.value;
         if (Physics.Raycast(sampleOrigin, Vector3.down, out groundHit, groundSampleHeight * 2f, groundMask, QueryTriggerInteraction.Ignore))
@@ -98,11 +99,11 @@ public class EnemyController : MonoBehaviour
 
     void ChooseTarget()
     {
-        // Pick a random point on the ground within wanderRadius
-        Vector3 randomDir = Random.insideUnitSphere * wanderRadius;
+        
+        Vector3 randomDir = Random.insideUnitSphere * wanderRadius; // picks a random point on the ground within wanderRadius
         Vector3 candidate = transform.position + randomDir;
-        // Sample ground height at candidate xz
-        Vector3 sampleOrigin = candidate + Vector3.up * groundSampleHeight;
+        Vector3 sampleOrigin = candidate + Vector3.up * groundSampleHeight; // sample ground height at candidate 
+
         RaycastHit hit;
         int groundMask = groundLayer.value == 0 ? ~0 : groundLayer.value;
         if (Physics.Raycast(sampleOrigin, Vector3.down, out hit, groundSampleHeight * 2f, groundMask, QueryTriggerInteraction.Ignore))
@@ -111,7 +112,6 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            // fallback to same-plane target
             candidate.y = transform.position.y;
             wanderTarget = candidate;
         }
@@ -144,10 +144,9 @@ public class EnemyController : MonoBehaviour
         {
             directionToPlayer.Normalize();
 
-            // Compute target horizontal position
-            Vector3 targetPos = transform.position + directionToPlayer * enemyChaseSpeed * Time.deltaTime;
-            // Sample ground height at target x/z
-            Vector3 sampleOrigin = targetPos + Vector3.up * groundSampleHeight;
+            Vector3 targetPos = transform.position + directionToPlayer * enemyChaseSpeed * Time.deltaTime; // computes the target horizontal position
+            Vector3 sampleOrigin = targetPos + Vector3.up * groundSampleHeight; // sample ground height at target 
+
             RaycastHit hit;
             int groundMask = groundLayer.value == 0 ? ~0 : groundLayer.value;
             if (Physics.Raycast(sampleOrigin, Vector3.down, out hit, groundSampleHeight * 2f, groundMask, QueryTriggerInteraction.Ignore))
@@ -197,9 +196,8 @@ public class EnemyController : MonoBehaviour
         gameObject.SetActive(false);
 
         yield return new WaitForSeconds(respawnDelay);
-
-        // Moves the enemy back to original placement position
-        transform.position = spawnPosition;
+        
+        transform.position = spawnPosition; // moves the enemy back to original placement position
         currentHealth = maxHealth;
         ChooseTarget();
 
