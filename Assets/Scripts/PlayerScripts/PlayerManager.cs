@@ -22,8 +22,8 @@ public class PlayerManager : MonoBehaviour
     [Header("Health")]
     public float maxHealth = 100f;
     public float health = 100f;
-    public float healthHealRate = 0.1f;
-    public float healthDrainRatePoison = 5f;
+    public float healingRate = 0f;
+    public float healthDrainRatePoison = 1f;
     public float healthDrainRateTemp = 0.01f;
     public float healthDrainRateHunger = 0.2f;
     public float healthDrainRateThirst = 0.2f;
@@ -55,8 +55,11 @@ public class PlayerManager : MonoBehaviour
        hunger > maxHunger * sprintThreshold
        && thirst > maxThirst * sprintThreshold;
 
-    private float poisonTimer = 0f;
-    private float healTimer = 0f;
+    // For status effects
+    public bool isHealing = false;
+    public bool isPoisoned = false;
+    public float healTimer = 0f;
+    public float poisonTimer = 0f;
 
     void Awake( )
     {
@@ -130,20 +133,14 @@ public class PlayerManager : MonoBehaviour
         health = Mathf.Max(health, 0f);
     }
 
-    void HealthHeal()
+    void HealthRestore( )
     {
-        if ( hunger >= maxHunger / 2)
+        if ( hunger >= maxHunger * 0.75)
         {
-            health += healthHealRate * Time.deltaTime;
-            health = Mathf.Min(health, maxHealth);
-        }
-
-        if (isHealing)
-        {
-            health += healthHealRate * Time.deltaTime;
-            health = Mathf.Min(health, maxHealth);
+            health += healingRate * Time.deltaTime;
         }
     }
+
 
     void TempDrain( )
     {
@@ -171,7 +168,7 @@ public class PlayerManager : MonoBehaviour
         HungerDrain(drainMult);
 
         HealthDrain();
-        HealthHeal();
+        HealthRestore();
 
         // Debug.Log("Hunger: " + hunger);
         if ( hud != null )
@@ -267,7 +264,7 @@ public class PlayerManager : MonoBehaviour
             {
                 Debug.Log("Poisoned");
                 isPoisoned = true;
-                hud.TogglePoisonIcon();
+                hud.SetActivePoisonIcon();
                 StartCoroutine(PoisonDebuffTimer(8));
             }
         }
@@ -299,7 +296,7 @@ public class PlayerManager : MonoBehaviour
 
         isPoisoned = false;
         poisonTimer = 0f;
-        hud.TogglePoisonIcon();
+        hud.SetInactivePoisonIcon();
         Debug.Log("No Longer Poisoned");
     }
 }

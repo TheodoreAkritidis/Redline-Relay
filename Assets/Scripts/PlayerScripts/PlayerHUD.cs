@@ -20,14 +20,19 @@ public class PlayerHUD : MonoBehaviour
     [SerializeField] private Image tempFill;
 
     [Header("Statuses")]
+    [SerializeField] private StatusManager status;
     [SerializeField] private GameObject poisonIcon;
     [SerializeField] private GameObject healingIcon;
-
-    private List<bool> statusArray = [false, false, false, false];
 
     private void Awake( )
     {
         poisonIcon.SetActive(false);
+        healingIcon.SetActive(false);
+
+        if ( status == null )
+        {
+            status = FindFirstObjectByType<StatusManager>();
+        }
     }
 
     public void SetHunger( float current, float max )
@@ -60,37 +65,24 @@ public class PlayerHUD : MonoBehaviour
         tempFill.fillAmount = n;
     }
 
-    public void TogglePoisonIcon( )
+    public void SetActivePoisonIcon( )
     {
-        poisonIcon.SetActive(!poisonIcon.activeSelf);
-
-        if ( poisonIcon.activeSelf && healingIcon.activeSelf )
-        {
-            poisonIcon.transform.Translate(64, 0, 0);
-        }
+        status.SetNewStatusIcon(poisonIcon);
     }
 
-    public void ToggleHealingIcon( )
+    public void SetInactivePoisonIcon( )
     {
-        healingIcon.SetActive(!healingIcon.activeSelf);
+        status.RemoveStatusIcon(poisonIcon);
 
-        // Find first empty status icon slot
-        if ( healingIcon.activeSelf )
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                if ( !statusArray[i] )
-                {
-                    statusArray[i];
-                    healingIcon.transform.Translate(64 * i, 0, 0);
-                    return;
-                }
-            }
-        }
-        else
-        {
-            
-        }
-        
+    }
+
+    public void SetActiveHealingIcon( )
+    {
+        status.SetNewStatusIcon(healingIcon);
+    }
+
+    public void SetInactiveHealingIcon( )
+    {
+        status.RemoveStatusIcon(healingIcon);
     }
 }
