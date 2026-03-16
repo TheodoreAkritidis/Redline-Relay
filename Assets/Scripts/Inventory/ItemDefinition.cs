@@ -15,9 +15,7 @@ public class ItemDefinition : ScriptableObject
 
     [Space(10)]
     public bool IsFood;
-    public bool AppliesStatus;
     public float FoodValue = 0;
-    public string Status = "None";
 
     [Space(20)]
     public bool IsWater;
@@ -42,5 +40,5 @@ public class ItemDefinition : ScriptableObject
 
     [Header("Status Effects")]
     public bool AppliesStatus = false;
-    public string Status;
+    public string Status = "None";
 }

@@ -29,8 +29,6 @@ public class PlayerManager : MonoBehaviour
     public float healthDrainRateThirst = 0.2f;
     public float emptyGracePeriod = 5f; // Time in seconds before health starts draining from hunger/thirst being empty
     private float emptyTimer;
-    private bool isHealing;
-    private bool isPoisoned;
 
     [Header("Temperature")]
     public float maxTemp = 100f;
