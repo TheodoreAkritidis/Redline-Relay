@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -22,6 +23,11 @@ public class EnemyController : MonoBehaviour
     public float attackDamage = 5f;
     public float attackCooldown = 5f; // controls the amount of time before an enemy can attack again
 
+    [Header("Health")]
+    public float maxHealth = 20f;
+    private float currentHealth;
+    public float respawnDelay = 1f; // seconds before respawning after death
+
     private float attackTimer = 0f;
     private PlayerManager playerManager;
 
@@ -35,7 +41,10 @@ public class EnemyController : MonoBehaviour
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
         }
 
-        playerManager = player.GetComponent<PlayerManager>();
+        if (player != null)
+            playerManager = player.GetComponent<PlayerManager>();
+
+        currentHealth = maxHealth;
 
         ChooseTarget();
 
@@ -134,7 +143,27 @@ public class EnemyController : MonoBehaviour
     {
         Debug.Log($"Enemy took {damage} damage!");
 
-        RespawnEnemy();
+        currentHealth -= damage;
+        if (currentHealth <= 0f)
+        {
+            StartCoroutine(HandleDeath());
+        }
+    }
+
+    private IEnumerator HandleDeath()
+    {
+        Debug.Log("Enemy died, respawning...");
+
+        gameObject.SetActive(false);
+
+        yield return new WaitForSeconds(respawnDelay);
+
+        // Moves the enemy back to original placement position
+        transform.position = spawnPosition;
+        currentHealth = maxHealth;
+        ChooseTarget();
+
+        gameObject.SetActive(true);
     }
 
     void RespawnEnemy()

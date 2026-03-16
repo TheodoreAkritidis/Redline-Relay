@@ -8,8 +8,13 @@ public class ItemUsage : MonoBehaviour
 
     public bool useBlocked = false;
 
-    [SerializeField] private float attackRange;
+    [SerializeField] private float attackRange = 3f;
     [SerializeField] private LayerMask enemyLayer;
+
+    [Header("Unarmed Attack")]
+    [SerializeField] private bool allowUnarmedAttack = true;
+    [SerializeField] private float unarmedDamage = 5f;
+    [SerializeField] private Key attackKey = Key.F;
 
     private void Awake()
     {
@@ -26,25 +31,11 @@ public class ItemUsage : MonoBehaviour
 
     public void OnUse(InputValue v)
     {
-        // Only handle press events from the Input System
-        if (!v.isPressed) return;
-        DoUse();
-    }
-
-    private void Update()
-    {
-        // Support legacy input (mouse left button and Enter) in case Input System isn't
-        // sending messages or the player expects these keys to work.
-        if (useBlocked) return;
-
-        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        if (useBlocked)
         {
-            DoUse();
+            return;
         }
-    }
 
-    private void DoUse()
-    {
         ItemDefinition item = inv.GetSelectedHotbarItem();
         bool consumed = false;
 
@@ -75,19 +66,79 @@ public class ItemUsage : MonoBehaviour
         }
     }
 
+    // InputSystem handler for a dedicated attack action (optional)
+    public void OnAttack(InputValue v)
+    {
+        if (!v.isPressed) return;
+        DoAttack();
+    }
+
+    private void Update()
+    {
+        if (useBlocked) return;
+
+        bool attackPressed = false;
+
+        var mouse = Mouse.current;
+        if (mouse != null && mouse.leftButton.wasPressedThisFrame)
+            attackPressed = true;
+
+        var keyboard = Keyboard.current;
+        if (keyboard != null && keyboard[attackKey].wasPressedThisFrame)
+            attackPressed = true;
+
+        if (attackPressed)
+        {
+            DoAttack();
+        }
+    }
+
+    private void DoAttack()
+    {        
+        ItemDefinition item = inv.GetSelectedHotbarItem();
+
+        if (item != null && item.isWeapon)
+        {
+            Attack(item.WeaponValue);
+            return;
+        }
+
+        // If the player doesn't have a weapon, allow unarmed attack if enabled
+        if (allowUnarmedAttack)
+        {
+            Debug.Log($"ItemUsage: performing unarmed attack (damage={unarmedDamage})");
+            Attack(unarmedDamage);
+        }
+    }
+
     private void Attack(float weaponDamage)
     {
-        Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+        if (Camera.main == null)
+        {
+            return;
+        }
+
+        Vector3 origin = Camera.main.transform.position;
+        Vector3 dir = Camera.main.transform.forward;
+
+        Debug.DrawRay(origin, dir * attackRange, Color.red, 1f);
+
+        Ray ray = new Ray(origin, dir);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, attackRange, enemyLayer))
         {
+            Debug.Log($"ItemUsage.Attack: Attack hit '{hit.collider.name}' with damage={weaponDamage}");
             EnemyController enemy = hit.collider.GetComponent<EnemyController>();
 
             if (enemy != null)
             {
                 enemy.TakeDamage(weaponDamage);
             }
+        }
+        else
+        {
+            Debug.Log("ItemUsage.Attack: Attack missed");
         }
     }
 }
