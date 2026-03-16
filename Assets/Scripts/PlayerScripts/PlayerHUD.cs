@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PlayerHUD : MonoBehaviour
 {
@@ -17,6 +18,17 @@ public class PlayerHUD : MonoBehaviour
 
     [Header("Temperature")]
     [SerializeField] private Image tempFill;
+
+    [Header("Statuses")]
+    [SerializeField] private GameObject poisonIcon;
+    [SerializeField] private GameObject healingIcon;
+
+    private List<bool> statusArray = [false, false, false, false];
+
+    private void Awake( )
+    {
+        poisonIcon.SetActive(false);
+    }
 
     public void SetHunger( float current, float max )
     {
@@ -46,5 +58,39 @@ public class PlayerHUD : MonoBehaviour
 
 
         tempFill.fillAmount = n;
+    }
+
+    public void TogglePoisonIcon( )
+    {
+        poisonIcon.SetActive(!poisonIcon.activeSelf);
+
+        if ( poisonIcon.activeSelf && healingIcon.activeSelf )
+        {
+            poisonIcon.transform.Translate(64, 0, 0);
+        }
+    }
+
+    public void ToggleHealingIcon( )
+    {
+        healingIcon.SetActive(!healingIcon.activeSelf);
+
+        // Find first empty status icon slot
+        if ( healingIcon.activeSelf )
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if ( !statusArray[i] )
+                {
+                    statusArray[i];
+                    healingIcon.transform.Translate(64 * i, 0, 0);
+                    return;
+                }
+            }
+        }
+        else
+        {
+            
+        }
+        
     }
 }
