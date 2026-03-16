@@ -5,11 +5,6 @@ public sealed class ResourceNodeInteractable : MonoBehaviour, IInteractable, ITo
     [Header("Drop")]
     [SerializeField] private ItemDefinition dropItem;
     [SerializeField] private int dropAmount = 1;
-    [SerializeField] private bool hasRandomDrops = false;
-    [SerializeField] private ItemDefinition randomDropItem;
-    [SerializeField] private int randomDropAmount;
-    [SerializeField] private float dropChance = 0.5f;
-
 
     [Header("Inventory")]
     [SerializeField] private bool addDirectToInventory = false;
@@ -160,14 +155,6 @@ public sealed class ResourceNodeInteractable : MonoBehaviour, IInteractable, ITo
 
         Vector3 dropPos = cachedCollider != null ? cachedCollider.bounds.center : transform.position;
         spawner.SpawnAtWorldPosition(new ItemStack(dropItem, amt), dropPos);
-
-        if (hasRandomDrops)
-        {
-            if (Random.Range(0f, 1f) <= dropChance)
-            {
-                spawner.SpawnAtWorldPosition(new ItemStack(randomDropItem, randomDropAmount), dropPos);
-            }
-        }
 
         if (destroyOnHarvest)
             Destroy(gameObject);
