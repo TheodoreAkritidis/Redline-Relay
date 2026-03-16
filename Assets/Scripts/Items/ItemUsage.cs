@@ -60,6 +60,11 @@ public class ItemUsage : MonoBehaviour
             Player.TryApplyStatus(item.Status);
         }
 
+        if (item.AppliesStatus)
+        {
+            player.TryApplyStatus(item.Status);
+        }
+
         if (item.DestroyOnUse && consumed)
         {
             Inv.ConsumeSelectedHotbarItem();

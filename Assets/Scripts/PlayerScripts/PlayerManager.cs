@@ -29,6 +29,8 @@ public class PlayerManager : MonoBehaviour
     public float healthDrainRateThirst = 0.2f;
     public float emptyGracePeriod = 5f; // Time in seconds before health starts draining from hunger/thirst being empty
     private float emptyTimer;
+    private bool isHealing;
+    private bool isPoisoned;
 
     [Header("Temperature")]
     public float maxTemp = 100f;
@@ -110,20 +112,22 @@ public class PlayerManager : MonoBehaviour
         {
             emptyTimer += Time.deltaTime;
         }
-        else
-        {
+        else {
             emptyTimer = 0f;
-            return;
         }
 
-        if ( emptyTimer < emptyGracePeriod )
+        if ( (emptyTimer < emptyGracePeriod) && !isPoisoned )
             return;
 
-        if ( !starving && !dehydrated ) return;
+        if ( !starving && !dehydrated && !isPoisoned ) return;
 
         float damage = 0f;
-        if ( starving ) damage += healthDrainRateHunger;
-        if ( dehydrated ) damage += healthDrainRateThirst;
+        if ( emptyTimer >= emptyGracePeriod )
+        {
+            if ( starving ) damage += healthDrainRateHunger;
+            if ( dehydrated ) damage += healthDrainRateThirst;
+        }
+        if ( isPoisoned ) damage += healthDrainRatePoison;
 
         health -= damage * Time.deltaTime;
         health = Mathf.Max(health, 0f);
