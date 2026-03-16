@@ -15,6 +15,10 @@ public class EnemyController : MonoBehaviour
     public Transform player;
     public float detectionRadius = 20f;
 
+    [Header("Grounding")]
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private float groundSampleHeight = 50f;
+
     private Vector3 wanderTarget;
     private bool playerDetected = false;
 
@@ -46,9 +50,21 @@ public class EnemyController : MonoBehaviour
 
         currentHealth = maxHealth;
 
-        ChooseTarget();
+        // Align spawn position to ground if possible
+        Vector3 sampleOrigin = transform.position + Vector3.up * groundSampleHeight;
+        RaycastHit groundHit;
+        int groundMask = groundLayer.value == 0 ? ~0 : groundLayer.value;
+        if (Physics.Raycast(sampleOrigin, Vector3.down, out groundHit, groundSampleHeight * 2f, groundMask, QueryTriggerInteraction.Ignore))
+        {
+            spawnPosition = groundHit.point;
+            transform.position = spawnPosition;
+        }
+        else
+        {
+            spawnPosition = transform.position;
+        }
 
-        spawnPosition = transform.position;
+        ChooseTarget();
     }
 
     // Update is called once per frame
@@ -82,9 +98,23 @@ public class EnemyController : MonoBehaviour
 
     void ChooseTarget()
     {
+        // Pick a random point on the ground within wanderRadius
         Vector3 randomDir = Random.insideUnitSphere * wanderRadius;
-        randomDir.y = 0;
-        wanderTarget = transform.position + randomDir;
+        Vector3 candidate = transform.position + randomDir;
+        // Sample ground height at candidate xz
+        Vector3 sampleOrigin = candidate + Vector3.up * groundSampleHeight;
+        RaycastHit hit;
+        int groundMask = groundLayer.value == 0 ? ~0 : groundLayer.value;
+        if (Physics.Raycast(sampleOrigin, Vector3.down, out hit, groundSampleHeight * 2f, groundMask, QueryTriggerInteraction.Ignore))
+        {
+            wanderTarget = hit.point;
+        }
+        else
+        {
+            // fallback to same-plane target
+            candidate.y = transform.position.y;
+            wanderTarget = candidate;
+        }
     }
 
     void AttackPlayer()
@@ -113,13 +143,23 @@ public class EnemyController : MonoBehaviour
         if (distanceToPlayer > stopDistance)
         {
             directionToPlayer.Normalize();
-            transform.position += directionToPlayer * enemyChaseSpeed * Time.deltaTime;
+
+            // Compute target horizontal position
+            Vector3 targetPos = transform.position + directionToPlayer * enemyChaseSpeed * Time.deltaTime;
+            // Sample ground height at target x/z
+            Vector3 sampleOrigin = targetPos + Vector3.up * groundSampleHeight;
+            RaycastHit hit;
+            int groundMask = groundLayer.value == 0 ? ~0 : groundLayer.value;
+            if (Physics.Raycast(sampleOrigin, Vector3.down, out hit, groundSampleHeight * 2f, groundMask, QueryTriggerInteraction.Ignore))
+            {
+                targetPos.y = hit.point.y;
+            }
+
+            transform.position = targetPos;
 
             directionToPlayer.y = 0;
             if (directionToPlayer != Vector3.zero)
-            {
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(directionToPlayer), 0.2f);
-            }
         }
     }
 

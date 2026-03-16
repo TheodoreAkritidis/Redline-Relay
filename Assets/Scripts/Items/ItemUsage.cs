@@ -126,10 +126,11 @@ public class ItemUsage : MonoBehaviour
         Ray ray = new Ray(origin, dir);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, attackRange, enemyLayer))
+        if (Physics.Raycast(ray, out hit, attackRange, enemyLayer, QueryTriggerInteraction.Collide))
         {
             Debug.Log($"ItemUsage.Attack: Attack hit '{hit.collider.name}' with damage={weaponDamage}");
-            EnemyController enemy = hit.collider.GetComponent<EnemyController>();
+            // Support colliders placed on child objects of the enemy prefab
+            EnemyController enemy = hit.collider.GetComponent<EnemyController>() ?? hit.collider.GetComponentInParent<EnemyController>();
 
             if (enemy != null)
             {
@@ -138,6 +139,18 @@ public class ItemUsage : MonoBehaviour
         }
         else
         {
+            // Try a fallback raycast without layer mask in case enemyLayer was not set correctly
+            if (Physics.Raycast(ray, out hit, attackRange))
+            {
+                Debug.Log($"ItemUsage.Attack: Fallback hit '{hit.collider.name}' with damage={weaponDamage}");
+                EnemyController enemy2 = hit.collider.GetComponent<EnemyController>() ?? hit.collider.GetComponentInParent<EnemyController>();
+                if (enemy2 != null)
+                {
+                    enemy2.TakeDamage(weaponDamage);
+                    return;
+                }
+            }
+
             Debug.Log("ItemUsage.Attack: Attack missed");
         }
     }
