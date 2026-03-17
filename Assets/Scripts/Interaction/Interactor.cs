@@ -44,7 +44,7 @@ public sealed class Interactor : MonoBehaviour
         current = null;
         currentBlocked = false;
 
-        if (inventoryUI != null && (inventoryUI.IsBackpackOpen || inventoryUI.IsCraftingOpen))
+        if (inventoryUI != null && (inventoryUI.IsBackpackOpen || inventoryUI.IsCraftingOpen || inventoryUI.IsSmelterOpen))
         {
             inventoryUI.SetCrosshairDefault();
             return;
@@ -119,8 +119,7 @@ public sealed class Interactor : MonoBehaviour
     {
         if (!v.isPressed) return;
 
-        if (inventoryUI != null && (inventoryUI.IsBackpackOpen || inventoryUI.IsCraftingOpen))
-            return;
+        if (inventoryUI != null && (inventoryUI.IsBackpackOpen || inventoryUI.IsCraftingOpen || inventoryUI.IsSmelterOpen)) return;
 
         if (current == null) return;
         if (currentBlocked) return;

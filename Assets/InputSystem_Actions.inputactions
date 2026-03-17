@@ -223,15 +223,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Smelter",
-                    "type": "Button",
-                    "id": "2aeb0b92-2bfb-4b9c-a1ee-9b85bf673a21",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Escape",
                     "type": "Button",
                     "id": "e22597d8-81eb-444b-b4fd-e4cd6ac379df",
@@ -789,17 +780,6 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Use",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f56e7c9e-bf14-4aef-b0cb-2ba08964fa42",
-                    "path": "<Keyboard>/v",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Smelter",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

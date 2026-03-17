@@ -1,0 +1,76 @@
+.menu-button {
+    -unity-background-image-tint-color: rgba(10, 14, 18, 0.22);
+    background-color: rgba(10, 14, 18, 0.22);
+    border-left-color: rgba(240, 199, 160, 0.41);
+    border-right-color: rgba(240, 199, 160, 0.41);
+    border-top-color: rgba(240, 199, 160, 0.41);
+    border-bottom-color: rgba(240, 199, 160, 0.41);
+    border-left-width: 2px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    font-size: 27px;
+    -unity-font-definition: url("project://database/Assets/UI%20Assets/Orbitron-VariableFont_wght%20SDF.asset?fileID=11400000&guid=689b96565e1cdfe4ba3bba37d0628015&type=2#Orbitron-VariableFont_wght SDF");
+    color: rgb(245, 239, 230);
+}
+
+.menu-button:hover {
+    -unity-background-image-tint-color: rgba(10, 14, 18, 0.22);
+    background-color: rgba(240, 196, 160, 0.34);
+    border-left-color: rgba(240, 191, 160, 0.41);
+    border-right-color: rgba(240, 191, 160, 0.41);
+    border-top-color: rgba(240, 191, 160, 0.41);
+    border-bottom-color: rgba(240, 191, 160, 0.41);
+    border-left-width: 2px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    font-size: 27px;
+    -unity-font-definition: url("project://database/Assets/UI%20Assets/Orbitron-VariableFont_wght%20SDF.asset?fileID=11400000&guid=689b96565e1cdfe4ba3bba37d0628015&type=2#Orbitron-VariableFont_wght SDF");
+    color: rgb(245, 238, 230);
+}
+
+.menu-button:active {
+    -unity-background-image-tint-color: rgba(10, 14, 18, 0.22);
+    background-color: rgba(240, 201, 160, 0.55);
+    border-left-color: rgba(240, 196, 160, 0.41);
+    border-right-color: rgba(240, 196, 160, 0.41);
+    border-top-color: rgba(240, 196, 160, 0.41);
+    border-bottom-color: rgba(240, 196, 160, 0.41);
+    border-left-width: 2px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    font-size: 27px;
+    -unity-font-definition: url("project://database/Assets/UI%20Assets/Orbitron-VariableFont_wght%20SDF.asset?fileID=11400000&guid=689b96565e1cdfe4ba3bba37d0628015&type=2#Orbitron-VariableFont_wght SDF");
+    color: rgb(230, 245, 245);
+}
+
+.settings-button {
+}
+
+.crosshair {
+    font-size: 28px;
+    color: rgb(230, 245, 245);
+    -unity-text-align: middle-center;
+}
+
+.crosshair.crosshair-voxel {
+    color: rgb(179, 236, 222);
+}
+
+.crosshair.crosshair-extract {
+    color: rgb(179, 236, 222);
+}

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00bb45fc057dc746852dfddd20611b7, type: 3}
+  m_Name: Apple
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  ItemId: apple
+  MaxStack: 20
+  Icon: {fileID: 21300000, guid: 603b46f76909cc14987eeae7a819341e, type: 3}
+  WorldPrefab: {fileID: 4106379419226469445, guid: 5b0039936440e4b4890cba0e4185a060, type: 3}
+  DestroyOnUse: 1
+  IsFood: 1
+  AppliesStatus: 0
+  FoodValue: 20
+  Status: None
+  IsWater: 1
+  WaterValue: 10
+  IsOre: 0
+  SmeltResult: {fileID: 0}
+  SmeltSecondsPerItem: 5
+  IsFuel: 0
+  FuelSeconds: 10

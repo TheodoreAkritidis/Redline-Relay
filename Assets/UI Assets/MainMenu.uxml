@@ -1,0 +1,53 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Assets/MainMenu.uss?fileID=7433441132597879392&amp;guid=5b239bcc45e60e64fb688b3dfc6f01f2&amp;type=3#MainMenu"/>
+    <ui:VisualElement name="MainMenuRoot" style="flex-grow: 1; -unity-background-scale-mode: scale-and-crop; position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;">
+        <ui:VisualElement name="Page_main" style="flex-grow: 1; -unity-background-scale-mode: scale-and-crop; position: absolute; left: 0; top: 0; right: 0; bottom: 0;">
+            <ui:Image name="Background" source="project://database/Assets/UI%20Assets/BackgroundMain.jpg?fileID=2800000&amp;guid=6a3a41b8763aad241a75d278d965567c&amp;type=3#BackgroundMain" scale-mode="ScaleAndCrop" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; -unity-background-scale-mode: scale-and-crop;"/>
+            <ui:VisualElement name="Dimmer" style="flex-grow: 1; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background-color: rgba(0, 0, 0, 0.18);"/>
+            <ui:VisualElement name="Content" style="flex-grow: 1; position: absolute; top: 0; left: 0; bottom: 0; right: 0; justify-content: center;">
+                <ui:VisualElement name="Header" style="flex-grow: 1; bottom: 0; position: absolute; left: 0; top: 160px; right: 0; align-items: center;">
+                    <ui:Label text="Redline Relay" name="Title" style="-unity-font-definition: url(&quot;project://database/Assets/UI%20Assets/Orbitron-VariableFont_wght%20SDF.asset?fileID=11400000&amp;guid=689b96565e1cdfe4ba3bba37d0628015&amp;type=2#Orbitron-VariableFont_wght SDF&quot;); font-size: 100px; color: rgb(255, 131, 78); -unity-font-style: bold; bottom: -10px;"/>
+                    <ui:Label text="placeholder" name="Subtitle" style="font-size: 40px; color: rgb(230, 245, 245); -unity-font-definition: url(&quot;project://database/Assets/UI%20Assets/Orbitron-VariableFont_wght%20SDF.asset?fileID=11400000&amp;guid=689b96565e1cdfe4ba3bba37d0628015&amp;type=2#Orbitron-VariableFont_wght SDF&quot;);"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="Buttons" style="flex-grow: 1; bottom: 0; left: auto; right: auto; top: 500px; width: 360px; height: 0; align-items: stretch; position: absolute; align-self: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
+                    <ui:Button text="Start Game" name="PlayButton" class="menu-button" style="height: 60px; bottom: 0; margin-bottom: 20px;"/>
+                    <ui:Button text="Settings" name="SettingsButton" class="menu-button settings-button" style="height: 60px; margin-bottom: 20px;"/>
+                    <ui:Button text="Attributions" name="AttributionsButton" class="menu-button" style="height: 60px; margin-bottom: 20px;"/>
+                    <ui:Button text="Quit to Desktop" name="QuitButton" class="menu-button quit-button" style="height: 60px; margin-top: 50px; width: 400px; align-self: center;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="PauseMenuRoot" style="flex-grow: 1; position: absolute; left: 0; bottom: 0; right: 0; top: 0; display: none;">
+        <ui:VisualElement name="Page_Pause" style="flex-grow: 1; position: absolute; top: 0; left: 0; bottom: 0; right: 0;">
+            <ui:VisualElement name="Dimmer" style="flex-grow: 1; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background-color: rgba(0, 0, 0, 0.44);"/>
+            <ui:VisualElement name="Content" style="flex-grow: 1; position: absolute; top: 0; left: 0; bottom: 0; right: 0;">
+                <ui:VisualElement name="Header" style="flex-grow: 1; position: absolute; top: 160px; left: 0; bottom: 0; right: 0; align-self: center; align-items: center;">
+                    <ui:Label text="Game Paused" name="Paused" style="align-self: auto; color: rgb(236, 207, 179); font-size: 80px; -unity-font-definition: url(&quot;project://database/Assets/UI%20Assets/Orbitron-VariableFont_wght%20SDF.asset?fileID=11400000&amp;guid=689b96565e1cdfe4ba3bba37d0628015&amp;type=2#Orbitron-VariableFont_wght SDF&quot;);"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="Buttons" style="flex-grow: 1; position: absolute; top: 400px; left: auto; bottom: 0; right: auto; align-self: center; width: 360px;">
+                    <ui:Button text="Return to Game" name="ResumeButton" class="menu-button" style="margin-bottom: 30px; width: 400px; align-self: center; height: 80px;"/>
+                    <ui:Button text="Settings" name="SettingsButton" class="menu-button settings-button" style="margin-top: 2px; width: 400px; height: 80px; align-self: center; margin-bottom: 30px;"/>
+                    <ui:Button text="Quit to Main Menu" name="PauseQuitButton" class="menu-button" style="margin-top: 100px; width: 400px; height: 80px; align-self: center;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="ContactMenuRoot" style="flex-grow: 1; position: absolute; left: 0; bottom: 0; right: 0; top: 0; display: flex;">
+        <ui:VisualElement name="Page_Extraction" style="flex-grow: 1; position: absolute; top: 0; left: 0; bottom: 0; right: 0;">
+            <ui:Image name="Background" source="project://database/Assets/UI%20Assets/extractionBackground.png?fileID=2800000&amp;guid=46885d2f20307b04f8c2c933c3ef9e7e&amp;type=3#extractionBackground" scale-mode="ScaleAndCrop" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; -unity-background-scale-mode: scale-and-crop; display: flex;"/>
+            <ui:VisualElement name="Dimmer" style="flex-grow: 1; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background-color: rgba(0, 0, 0, 0.72);"/>
+            <ui:VisualElement name="Content" style="flex-grow: 1; position: absolute; top: 0; left: 0; bottom: 0; right: 0;">
+                <ui:VisualElement name="Header" style="flex-grow: 1; position: absolute; top: 160px; left: 0; bottom: 0; right: 0; align-self: center; align-items: center;">
+                    <ui:Label text="Contact Established" name="Extracted" style="align-self: auto; color: rgb(173, 238, 161); font-size: 80px; -unity-font-definition: url(&quot;project://database/Assets/UI%20Assets/Orbitron-VariableFont_wght%20SDF.asset?fileID=11400000&amp;guid=689b96565e1cdfe4ba3bba37d0628015&amp;type=2#Orbitron-VariableFont_wght SDF&quot;);"/>
+                    <ui:Label text="placeholder" name="Subtitle" style="font-size: 35px; color: rgb(230, 245, 245); -unity-font-definition: url(&quot;project://database/Assets/UI%20Assets/Orbitron-VariableFont_wght%20SDF.asset?fileID=11400000&amp;guid=689b96565e1cdfe4ba3bba37d0628015&amp;type=2#Orbitron-VariableFont_wght SDF&quot;);"/>
+                    <ui:Label text="Time till contact:" name="contactTimeLabel" style="-unity-font-definition: url(&quot;project://database/Assets/UI%20Assets/Orbitron-VariableFont_wght%20SDF.asset?fileID=11400000&amp;guid=689b96565e1cdfe4ba3bba37d0628015&amp;type=2#Orbitron-VariableFont_wght SDF&quot;); color: rgb(236, 213, 179); font-size: 35px; border-top-width: 140px;"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="Buttons" style="flex-grow: 1; position: absolute; top: 600px; left: auto; bottom: 0; right: auto; align-self: center; width: 360px;">
+                    <ui:Button text="Restart" name="RestartButton" class="menu-button" style="width: 400px; height: 80px; align-items: center; align-self: center; margin-top: 100px;"/>
+                    <ui:Button text="Quit to Main Menu" name="VictoryQuitButton" class="menu-button" style="margin-top: 60px; width: 400px; height: 80px; align-self: center;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

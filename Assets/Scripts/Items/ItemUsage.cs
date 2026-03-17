@@ -3,21 +3,21 @@ using UnityEngine.InputSystem;
 
 public class ItemUsage : MonoBehaviour
 {
-    [SerializeField] private PlayerInventoryComponent inv;
-    [SerializeField] private PlayerManager player;
+    [SerializeField] private PlayerInventoryComponent Inv;
+    [SerializeField] private PlayerManager Player;
 
     public bool useBlocked = false;
 
     private void Awake()
     {
-        if (inv == null)
+        if (Inv == null)
         {
-            inv = GetComponent<PlayerInventoryComponent>();
+            Inv = GetComponent<PlayerInventoryComponent>();
         }
 
-        if (player == null)
+        if (Player == null)
         {
-            player = GetComponent<PlayerManager>();
+            Player = GetComponent<PlayerManager>();
         }
     }
 
@@ -28,7 +28,8 @@ public class ItemUsage : MonoBehaviour
             return;
         }
 
-        ItemDefinition item = inv.GetSelectedHotbarItem();
+        ItemDefinition item = Inv.GetSelectedHotbarItem();
+        ItemStack stack = Inv.GetSelectedHotbarStack();
         bool consumed = false;
 
         if (item == null)
@@ -38,18 +39,45 @@ public class ItemUsage : MonoBehaviour
 
         if (item.IsFood)
         {
-            consumed = player.TryEat(item.FoodValue);
+            consumed = Player.TryEat(item.FoodValue);
         }
 
         if (item.IsWater)
         {
-            consumed = player.TryDrink(item.WaterValue);
+            consumed = Player.TryDrink(item.WaterValue);
+        }
+
+        if (item is CanteenItem canteen)
+        {
+            Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
+            DrinkCanteen(stack, canteen);
+            Debug.Log("Drank from Canteen");
+            Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
+        }
+
+        if (item.AppliesStatus)
+        {
+            Player.TryApplyStatus(item.Status);
         }
 
         if (item.DestroyOnUse && consumed)
         {
-            inv.ConsumeSelectedHotbarItem();
-            inv.NotifyInventoryChanged();
+            Inv.ConsumeSelectedHotbarItem();
+            Inv.NotifyInventoryChanged();
         }
     }
+
+    // Drink from canteen if not empty, and remove consumed amount.
+    public void DrinkCanteen( ItemStack stack, CanteenItem item )
+    {
+        if ( stack.CanteenCapacity <= 0 )
+        {
+            return;
+        }
+
+        Player.TryDrink(item.ConsumeAmount);
+        stack.CanteenCapacity = Mathf.Max(0, stack.CanteenCapacity - item.ConsumeAmount);
+        Inv.SetSelectedHotbarStack(stack);
+    }
+
 }

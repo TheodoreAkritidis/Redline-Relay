@@ -107,6 +107,10 @@ public sealed class InventoryUITKView : MonoBehaviour
     private VisualElement crosshairRoot;
     private Label crosshairLabel;
 
+    // Tutorial HUD
+    private VisualElement tutorialRoot;
+    private Label tutorialLabel;
+
     private bool backpackOpen;
     public void SetCrosshairMessage(string message)
     {
@@ -280,7 +284,8 @@ public sealed class InventoryUITKView : MonoBehaviour
         BuildSmelterOverlay();
         BuildHotbarHud();
         BuildCursorVisual();
-        BuildCrosshairHud();  
+        BuildCrosshairHud();
+        BuildTutorialHud();
 
         if (backpackOverlay != null)
             backpackOverlay.style.display = backpackOpen ? DisplayStyle.Flex : DisplayStyle.None;
@@ -290,6 +295,61 @@ public sealed class InventoryUITKView : MonoBehaviour
         SetCrosshairVisible(!backpackOpen);
         SetCrosshairDefault();
     }
+
+    //------------------------------ Tutorial -------------------------------
+
+    public void SetTutorialText(string message)
+    {
+        if (!built || tutorialLabel == null) return;
+        tutorialLabel.text = string.IsNullOrWhiteSpace(message) ? "" : message;
+    }
+
+    private void BuildTutorialHud()
+    {
+        tutorialRoot = new VisualElement();
+        tutorialRoot.pickingMode = PickingMode.Ignore;
+
+        tutorialRoot.style.position = Position.Absolute;
+        tutorialRoot.style.left = 20;
+        tutorialRoot.style.top = Length.Percent(30);
+        tutorialRoot.style.width = 360;
+        tutorialRoot.style.minHeight = 120;
+
+        tutorialRoot.style.paddingLeft = 14;
+        tutorialRoot.style.paddingRight = 14;
+        tutorialRoot.style.paddingTop = 12;
+        tutorialRoot.style.paddingBottom = 12;
+
+        tutorialRoot.style.backgroundColor = new Color(0f, 0f, 0f, 0.55f);
+        tutorialRoot.style.borderTopLeftRadius = 8;
+        tutorialRoot.style.borderTopRightRadius = 8;
+        tutorialRoot.style.borderBottomLeftRadius = 8;
+        tutorialRoot.style.borderBottomRightRadius = 8;
+
+        tutorialRoot.style.borderTopWidth = 1;
+        tutorialRoot.style.borderRightWidth = 1;
+        tutorialRoot.style.borderBottomWidth = 1;
+        tutorialRoot.style.borderLeftWidth = 1;
+
+        tutorialRoot.style.borderTopColor = new Color(1f, 1f, 1f, 0.15f);
+        tutorialRoot.style.borderRightColor = new Color(1f, 1f, 1f, 0.15f);
+        tutorialRoot.style.borderBottomColor = new Color(1f, 1f, 1f, 0.15f);
+        tutorialRoot.style.borderLeftColor = new Color(1f, 1f, 1f, 0.15f);
+
+        root.Add(tutorialRoot);
+
+        tutorialLabel = new Label();
+        tutorialLabel.pickingMode = PickingMode.Ignore;
+        tutorialLabel.style.whiteSpace = WhiteSpace.Normal;
+        tutorialLabel.style.unityTextAlign = TextAnchor.UpperLeft;
+        tutorialLabel.style.color = Color.white;
+        tutorialLabel.style.fontSize = 16;
+        tutorialLabel.style.flexGrow = 1;
+
+        tutorialRoot.Add(tutorialLabel);
+    }
+
+
     //---------------------------------- START OF SMELTER -----------------------------------
 
     private void BuildSmelterOverlay()
