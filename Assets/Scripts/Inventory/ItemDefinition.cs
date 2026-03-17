@@ -21,6 +21,10 @@ public class ItemDefinition : ScriptableObject
     public bool IsWater;
     public float WaterValue = 0;
 
+    [Header("Attack/Damage")]
+    public bool isWeapon;
+    public float WeaponValue = 0;
+    
     [Header("Smelting")]
     [Tooltip("If true, this item can be smelted in the Smelter ore slot.")]
     public bool IsOre;
