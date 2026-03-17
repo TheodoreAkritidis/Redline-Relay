@@ -109,7 +109,7 @@ public class ItemUsage : MonoBehaviour
 
     private void DoAttack()
     {        
-        ItemDefinition item = inv.GetSelectedHotbarItem();
+        ItemDefinition item = Inv.GetSelectedHotbarItem();
 
         if (item != null && item.isWeapon)
         {
@@ -125,14 +125,22 @@ public class ItemUsage : MonoBehaviour
         }
     }
 
-    private void Attack(float weaponDamage)
-    {
-        if (Camera.main == null)
-
     // Drink from canteen if not empty, and remove consumed amount.
     public void DrinkCanteen( ItemStack stack, CanteenItem item )
     {
         if ( stack.CanteenCapacity <= 0 )
+        {
+            return;
+        }
+
+        Player.TryDrink(item.ConsumeAmount);
+        stack.CanteenCapacity = Mathf.Max(0, stack.CanteenCapacity - item.ConsumeAmount);
+        Inv.SetSelectedHotbarStack(stack);
+    }
+
+    private void Attack(float weaponDamage)
+    {
+        if (Camera.main == null)
         {
             return;
         }
@@ -170,8 +178,5 @@ public class ItemUsage : MonoBehaviour
             Debug.Log("ItemUsage.Attack: Attack missed");
         }
     }
-        Player.TryDrink(item.ConsumeAmount);
-        stack.CanteenCapacity = Mathf.Max(0, stack.CanteenCapacity - item.ConsumeAmount);
-        Inv.SetSelectedHotbarStack(stack);
-    }
 }
+
