@@ -1,15 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PlayerHUD : MonoBehaviour
 {
     [Header("Hunger")]
-    [SerializeField] private Image hungerTopFill;
-    [SerializeField] private Image hungerBottomFill;
+    [SerializeField] private Image hungerFill;
 
     [Header("Thirst")]
-    [SerializeField] private Image thirstTopFill;
-    [SerializeField] private Image thirstBottomFill;
+    [SerializeField] private Image thirstFill;
 
     // For hunger and thirst I was following the sketch Jacob did so there is a top and bottom half.
     // If we end up simpligfying the design the code will be very simmilar to how health is done.
@@ -20,35 +19,34 @@ public class PlayerHUD : MonoBehaviour
     [Header("Temperature")]
     [SerializeField] private Image tempFill;
 
-    public void SetHunger( float current, float max, float sprintThreshold )
-    {
-        float normalized = (max <= 0f) ? 0f : Mathf.Clamp01(current / max);
+    [Header("Statuses")]
+    [SerializeField] private StatusManager status;
+    [SerializeField] private GameObject poisonIcon;
+    [SerializeField] private GameObject healingIcon;
 
-        if ( normalized > sprintThreshold )
+    private void Awake( )
+    {
+        poisonIcon.SetActive(false);
+        healingIcon.SetActive(false);
+
+        if ( status == null )
         {
-            hungerBottomFill.fillAmount = 1f;
-            hungerTopFill.fillAmount = (normalized - sprintThreshold) / (1f - sprintThreshold);
-        }
-        else
-        {
-            hungerBottomFill.fillAmount = 0f;
-            hungerTopFill.fillAmount = (sprintThreshold <= 0f) ? 0f : (normalized / sprintThreshold);
+            status = FindFirstObjectByType<StatusManager>();
         }
     }
-    public void SetThirst( float current, float max, float sprintThreshold )
+
+    public void SetHunger( float current, float max )
     {
         float normalized = (max <= 0f) ? 0f : Mathf.Clamp01(current / max);
 
-        if ( normalized > sprintThreshold )
-        {
-            thirstBottomFill.fillAmount = 1f;
-            thirstTopFill.fillAmount = (normalized - sprintThreshold) / (1f - sprintThreshold);
-        }
-        else
-        {
-            thirstBottomFill.fillAmount = 0f;
-            thirstTopFill.fillAmount = (sprintThreshold <= 0f) ? 0f : (normalized / sprintThreshold);
-        }
+        hungerFill.fillAmount = normalized;
+    }
+
+    public void SetThirst( float current, float max )
+    {
+        float normalized = (max <= 0f) ? 0f : Mathf.Clamp01(current / max);
+
+        thirstFill.fillAmount = normalized;
     }
 
 
@@ -65,5 +63,26 @@ public class PlayerHUD : MonoBehaviour
 
 
         tempFill.fillAmount = n;
+    }
+
+    public void SetActivePoisonIcon( )
+    {
+        status.SetNewStatusIcon(poisonIcon);
+    }
+
+    public void SetInactivePoisonIcon( )
+    {
+        status.RemoveStatusIcon(poisonIcon);
+
+    }
+
+    public void SetActiveHealingIcon( )
+    {
+        status.SetNewStatusIcon(healingIcon);
+    }
+
+    public void SetInactiveHealingIcon( )
+    {
+        status.RemoveStatusIcon(healingIcon);
     }
 }

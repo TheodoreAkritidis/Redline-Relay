@@ -2,56 +2,237 @@ using UnityEngine;
 
 public class BackgroundMusic : MonoBehaviour
 {
-    [Header("Background Music Sources")]
-    [SerializeField] private AudioSource[] musicSources;
+    [Header("Dedicated Music Sources")]
+    [SerializeField] private AudioSource menuMusicSource;
+    [SerializeField] private AudioSource victoryMusicSource;
+
+    [Header("Gameplay Music Sources")]
+    [SerializeField] private AudioSource[] gameplayMusicSources;
 
     [Header("Music Settings")]
-    [SerializeField] private float timeBetweenMusicChecks = 5f;
-    [Header("volume should be between 0.0 to 1.0")]
     [SerializeField] private float backgroundMusicVolume = 1.0f;
 
-    private int songIndex = 0;
-    private bool anyMusicIsPlaying = false;
+    private bool gameplayMusicActive = false;
+
+    private int nextGameplayIndex = 0;
+    private bool gameplayPaused;
 
     private void Awake()
     {
-        //if no music sources are assigned, log a warning and disable this script to prevent errors
-        if (musicSources == null || musicSources.Length == 0)
+        if (gameplayMusicSources == null || gameplayMusicSources.Length == 0)
         {
-            Debug.LogWarning($"{nameof(BackgroundMusic)}: No music sources assigned.", this);
-            enabled = false; // disables this script
+            Debug.LogWarning($"{nameof(BackgroundMusic)}: No gameplay music sources assigned.", this);
+        }
+
+        if (menuMusicSource != null)
+            menuMusicSource.ignoreListenerPause = true;
+
+        if (victoryMusicSource != null)
+            victoryMusicSource.ignoreListenerPause = true;
+
+        if (gameplayMusicSources != null)
+        {
+            for (int i = 0; i < gameplayMusicSources.Length; i++)
+            {
+                if (gameplayMusicSources[i] == null) continue;
+                gameplayMusicSources[i].ignoreListenerPause = false;
+                gameplayMusicSources[i].volume = backgroundMusicVolume;
+            }
+        }
+
+        if (menuMusicSource != null)
+            menuMusicSource.volume = backgroundMusicVolume;
+
+        if (victoryMusicSource != null)
+            victoryMusicSource.volume = backgroundMusicVolume;
+
+        nextGameplayIndex = GetRandomGameplayStartIndex();
+        gameplayPaused = false;
+    }
+
+    private void Update()
+    {
+        if (!gameplayMusicActive) return;
+        if (gameplayPaused) return;
+        if (IsAnyGameplayTrackPlaying()) return;
+
+        PlayNextGameplayTrack();
+    }
+
+    public void PlayMenuMusic()
+    {
+        gameplayMusicActive = false;
+        gameplayPaused = false;
+
+        StopVictoryMusic();
+        StopGameplayMusic(resetClips: true);
+
+        if (menuMusicSource == null) return;
+
+        menuMusicSource.volume = backgroundMusicVolume;
+        menuMusicSource.Stop();
+        menuMusicSource.Play();
+    }
+
+    public void StartGameplayMusicFresh()
+    {
+        gameplayMusicActive = true;
+        gameplayPaused = false;
+
+        StopMenuMusic();
+        StopVictoryMusic();
+        StopGameplayMusic(resetClips: true);
+
+        nextGameplayIndex = GetRandomGameplayStartIndex();
+        PlayNextGameplayTrack();
+    }
+
+    public void PauseGameplayMusic()
+    {
+        if (gameplayPaused) return;
+
+        AudioSource current = GetCurrentGameplayTrack();
+        if (current != null && current.isPlaying)
+            current.Pause();
+
+        gameplayPaused = true;
+    }
+
+    public void ResumeGameplayMusic()
+    {
+        if (!gameplayPaused) return;
+
+        AudioSource current = GetCurrentPausedGameplayTrack();
+        if (current != null)
+        {
+            current.UnPause();
+        }
+        else
+        {
+            PlayNextGameplayTrack();
+        }
+
+        gameplayPaused = false;
+    }
+
+    public void PlayVictoryMusic()
+    {
+        gameplayMusicActive = false;
+        gameplayPaused = false;
+
+        StopMenuMusic();
+        StopGameplayMusic(resetClips: true);
+
+        if (victoryMusicSource == null) return;
+
+        victoryMusicSource.volume = backgroundMusicVolume;
+        victoryMusicSource.Stop();
+        victoryMusicSource.Play();
+    }
+
+    public void StopAllMusic()
+    {
+        gameplayMusicActive = false;
+        gameplayPaused = false;
+
+        StopMenuMusic();
+        StopVictoryMusic();
+        StopGameplayMusic(resetClips: true);
+    }
+
+    private void PlayNextGameplayTrack()
+    {
+        if (gameplayMusicSources == null || gameplayMusicSources.Length == 0)
             return;
-        }
 
-        songIndex = Random.Range(0, musicSources.Length);
+        AudioSource source = gameplayMusicSources[nextGameplayIndex];
+        nextGameplayIndex++;
+        if (nextGameplayIndex >= gameplayMusicSources.Length)
+            nextGameplayIndex = 0;
+
+        if (source == null || source.clip == null)
+            return;
+
+        source.volume = backgroundMusicVolume;
+        source.Stop();
+        source.Play();
     }
 
-    private void Start()
+    private bool IsAnyGameplayTrackPlaying()
     {
-        InvokeRepeating(nameof(PlayMusic), 0f, timeBetweenMusicChecks);
+        if (gameplayMusicSources == null) return false;
+
+        for (int i = 0; i < gameplayMusicSources.Length; i++)
+        {
+            AudioSource source = gameplayMusicSources[i];
+            if (source != null && source.isPlaying)
+                return true;
+        }
+
+        return false;
     }
 
-    private void PlayMusic()
+    private AudioSource GetCurrentGameplayTrack()
     {
-        anyMusicIsPlaying = false;
-        for (int i = 0; i < musicSources.Length; i++)
+        if (gameplayMusicSources == null) return null;
+
+        for (int i = 0; i < gameplayMusicSources.Length; i++)
         {
-            if(musicSources[i].isPlaying)
-            {
-                anyMusicIsPlaying = true;
-                break;
-            }
+            AudioSource source = gameplayMusicSources[i];
+            if (source != null && source.isPlaying)
+                return source;
         }
 
-        if (!anyMusicIsPlaying)
+        return null;
+    }
+
+    private AudioSource GetCurrentPausedGameplayTrack()
+    {
+        if (gameplayMusicSources == null) return null;
+
+        for (int i = 0; i < gameplayMusicSources.Length; i++)
         {
-            musicSources[songIndex].volume = backgroundMusicVolume;
-            musicSources[songIndex].Play();
-            songIndex++;
-            if(songIndex >= musicSources.Length)
-            {
-                songIndex = 0;
-            }
+            AudioSource source = gameplayMusicSources[i];
+            if (source != null && source.clip != null && source.time > 0f && !source.isPlaying)
+                return source;
         }
+
+        return null;
+    }
+
+    private void StopMenuMusic()
+    {
+        if (menuMusicSource != null)
+            menuMusicSource.Stop();
+    }
+
+    private void StopVictoryMusic()
+    {
+        if (victoryMusicSource != null)
+            victoryMusicSource.Stop();
+    }
+
+    private void StopGameplayMusic(bool resetClips)
+    {
+        if (gameplayMusicSources == null) return;
+
+        for (int i = 0; i < gameplayMusicSources.Length; i++)
+        {
+            AudioSource source = gameplayMusicSources[i];
+            if (source == null) continue;
+
+            source.Stop();
+
+            if (resetClips)
+                source.time = 0f;
+        }
+    }
+
+    private int GetRandomGameplayStartIndex()
+    {
+        if (gameplayMusicSources == null || gameplayMusicSources.Length == 0)
+            return 0;
+
+        return Random.Range(0, gameplayMusicSources.Length);
     }
 }

@@ -9,7 +9,7 @@ public sealed class WorldItemSpawner : MonoBehaviour
     [SerializeField] private float footUpOffset = 0.05f;
     [SerializeField] private float groundRayUp = 0.5f;
     [SerializeField] private float groundRayDown = 2.0f;
-    [SerializeField] private LayerMask groundMask = ~0;
+    [SerializeField] private LayerMask groundMask;
 
     public bool SpawnAtFeet(ItemStack stack, Transform playerRoot)
     {

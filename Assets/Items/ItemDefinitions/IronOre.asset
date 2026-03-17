@@ -21,3 +21,8 @@ MonoBehaviour:
   FoodValue: 0
   IsWater: 0
   WaterValue: 0
+  IsOre: 1
+  SmeltResult: {fileID: 11400000, guid: a9ac54f174cdd9b4bbc2e1629f9a5be5, type: 2}
+  SmeltSecondsPerItem: 60
+  IsFuel: 0
+  FuelSeconds: 10

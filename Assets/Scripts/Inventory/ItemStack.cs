@@ -9,15 +9,19 @@ public struct ItemStack
 
     public bool IsEmpty => Item == null || Quantity <= 0;
 
+    public float CanteenCapacity;
+
     public ItemStack(ItemDefinition item, int quantity)
     {
         Item = item;
         Quantity = quantity;
+        CanteenCapacity = 0f;
     }
 
     public void Clear()
     {
         Item = null;
         Quantity = 0;
+        CanteenCapacity = 0f;
     }
 }

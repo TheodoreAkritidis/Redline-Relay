@@ -639,7 +639,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5773163815267603218}
-  - component: {fileID: -3630029049265702434}
   m_Layer: 8
   m_Name: ironOrePrefab
   m_TagString: Untagged
@@ -714,26 +713,6 @@ Transform:
   - {fileID: 2038422469468466019}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -54.09, z: 0}
---- !u!114 &-3630029049265702434
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534359110187697570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cffe2f87916ac074da06c9730252f914, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ResourceNodeInteractable
-  dropItem: {fileID: 11400000, guid: c2113a56e9b42cd42b02d2112ce138ae, type: 2}
-  dropAmount: 3
-  addDirectToInventory: 0
-  dropRemainderIfFull: 1
-  requiredTool: {fileID: 11400000, guid: 3f0dc44ff817b684a8f8ec0d587b850a, type: 2}
-  requiredToolNameOverride: Stone Pickaxe
-  verb: Mine
-  destroyOnHarvest: 1
 --- !u!1 &1785124189860790895
 GameObject:
   m_ObjectHideFlags: 0
