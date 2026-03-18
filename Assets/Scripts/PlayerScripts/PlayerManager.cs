@@ -30,6 +30,14 @@ public class PlayerManager : MonoBehaviour
     public float emptyGracePeriod = 5f; // Time in seconds before health starts draining from hunger/thirst being empty
     private float emptyTimer;
 
+    [Header("Respawn")]
+    [SerializeField] private Transform respawnPoint;
+    [SerializeField] private PlayerInventoryComponent playerInventory;
+    [SerializeField] private Rigidbody playerRigidbody;
+    [SerializeField] private ItemDefinition[] removeOnDeathItems;
+
+    private bool isDead;
+
     [Header("Temperature")]
     public float maxTemp = 100f;
     public float temp = 100f;
@@ -63,6 +71,8 @@ public class PlayerManager : MonoBehaviour
     {
         if ( controller == null ) controller = GetComponent<SimpleFpsController>();
         if ( hud == null ) hud = FindFirstObjectByType<PlayerHUD>();
+        if (playerInventory == null) playerInventory = GetComponent<PlayerInventoryComponent>();
+        if (playerRigidbody == null) playerRigidbody = GetComponent<Rigidbody>();
     }
 
     void ColdDamageCheck( )
@@ -176,9 +186,80 @@ public class PlayerManager : MonoBehaviour
             hud.SetHealth(health, maxHealth);
             hud.SetTemperature(temp, maxTemp);
         }
-
+        if (!isDead && health <= 0f)
+        {
+            HandleDeathAndRespawn();
+        }
         if ( controller != null )
             controller.SetSprintAllowed(CanSprint);
+    }
+    private void HandleDeathAndRespawn()
+    {
+        isDead = true;
+
+        RemoveDeathItemsFromInventory();
+        RespawnPlayer();
+    }
+
+    private void RemoveDeathItemsFromInventory()
+    {
+        if (playerInventory == null || playerInventory.Model == null || removeOnDeathItems == null)
+            return;
+
+        var hotbar = playerInventory.Model.Hotbar;
+        var backpack = playerInventory.Model.Backpack;
+
+        for (int i = 0; i < removeOnDeathItems.Length; i++)
+        {
+            ItemDefinition item = removeOnDeathItems[i];
+            if (item == null) continue;
+
+            int total = InventoryRules.CountItem(hotbar, backpack, item);
+            if (total > 0)
+                InventoryRules.TryConsume(hotbar, backpack, item, total);
+        }
+
+        playerInventory.NotifyInventoryChanged();
+    }
+
+    private void RespawnPlayer()
+    {
+        if (controller != null)
+            controller.SendMessage("CloseAllMenus", SendMessageOptions.DontRequireReceiver);
+
+        if (playerRigidbody != null)
+        {
+            playerRigidbody.linearVelocity = Vector3.zero;
+            playerRigidbody.angularVelocity = Vector3.zero;
+        }
+
+        if (respawnPoint != null)
+        {
+            transform.position = respawnPoint.position;
+            transform.rotation = respawnPoint.rotation;
+        }
+
+        health = maxHealth;
+        hunger = maxHunger;
+        thirst = maxThirst;
+        temp = maxTemp;
+
+        emptyTimer = 0f;
+        isPoisoned = false;
+        isHealing = false;
+        healTimer = 0f;
+        poisonTimer = 0f;
+
+        if (hud != null)
+        {
+            hud.SetHunger(hunger, maxHunger);
+            hud.SetThirst(thirst, maxThirst);
+            hud.SetHealth(health, maxHealth);
+            hud.SetTemperature(temp, maxTemp);
+            hud.SetInactivePoisonIcon();
+        }
+
+        isDead = false;
     }
 
     // Returns true if successfully drank (useful for consumables)

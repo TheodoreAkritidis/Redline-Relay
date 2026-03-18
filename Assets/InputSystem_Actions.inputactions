@@ -64,7 +64,7 @@
                     "name": "Jump",
                     "type": "Button",
                     "id": "f1ba0d36-48eb-4cd5-b651-1c94a6531f70",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -226,6 +226,24 @@
                     "name": "Escape",
                     "type": "Button",
                     "id": "e22597d8-81eb-444b-b4fd-e4cd6ac379df",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "HotbarNext",
+                    "type": "Button",
+                    "id": "e3e74dbd-e5c5-45f6-b9d4-f49666c28d30",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "alternateAction",
+                    "type": "Button",
+                    "id": "41dc16c1-7dfe-4eb9-970c-b0fcd7a5fe61",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -631,6 +649,17 @@
                 },
                 {
                     "name": "",
+                    "id": "d072eb8c-d9d6-4728-ba6f-67908d93d961",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Inventory",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "4fe47167-9e4c-401a-9136-ec86829253e3",
                     "path": "<Keyboard>/1",
                     "interactions": "",
@@ -752,6 +781,17 @@
                 },
                 {
                     "name": "",
+                    "id": "c6f9a6c6-12f3-4752-a2ab-f3f3bb981043",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Crafting",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "ec988fe7-663d-4b17-bd99-7c473bf70ebe",
                     "path": "<Gamepad>/leftShoulder",
                     "interactions": "",
@@ -791,6 +831,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "Escape",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2449a687-4334-43b2-bc79-740d2dc0c0c3",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Escape",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7b78e6c2-3d39-4263-abf6-cb24f3af3b65",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "HotbarNext",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1cd196a2-90d7-4e7a-afb9-f922d15865bd",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "alternateAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

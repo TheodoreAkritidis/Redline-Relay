@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5856969635373646236}
   - component: {fileID: 707113424474110305}
   - component: {fileID: 5908385707872782397}
+  - component: {fileID: -778833577466472365}
   m_Layer: 0
   m_Name: Stick
   m_TagString: Untagged
@@ -111,3 +112,26 @@ MonoBehaviour:
   requiredToolNameOverride: 
   verb: Pick up
   destroyOnHarvest: 1
+--- !u!136 &-778833577466472365
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 357197144797248253}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.10445334
+  m_Height: 1.6700728
+  m_Direction: 1
+  m_Center: {x: 0.0000000049163047, y: 0.8350363, z: -0.000000032913075}
