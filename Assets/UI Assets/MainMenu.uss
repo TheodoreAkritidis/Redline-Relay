@@ -94,3 +94,6 @@
 .crosshair.crosshair-extract {
     color: rgb(179, 236, 222);
 }
+
+.intro-line {
+}

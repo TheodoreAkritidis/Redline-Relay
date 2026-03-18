@@ -8,6 +8,7 @@ public sealed class MenuFlowController : MonoBehaviour
     private enum MenuState
     {
         MainMenu,
+        Intro,
         Playing,
         Paused,
         Victory
@@ -30,6 +31,9 @@ public sealed class MenuFlowController : MonoBehaviour
     [SerializeField] private string victoryRestartButtonName = "RestartButton";
     [SerializeField] private string victoryQuitButtonName = "VictoryQuitButton";
 
+    [Header("Intro UI")]
+    [SerializeField] private string introRootName = "TextMenuRoot";
+
     [Header("Victory UI")]
     [SerializeField] private string victoryTimeLabelName = "contactTimeLabel";
 
@@ -38,6 +42,7 @@ public sealed class MenuFlowController : MonoBehaviour
 
     private VisualElement root;
     private VisualElement mainMenuRoot;
+    private VisualElement introRoot;
     private VisualElement pauseMenuRoot;
     private VisualElement victoryMenuRoot;
 
@@ -49,7 +54,6 @@ public sealed class MenuFlowController : MonoBehaviour
     private Button victoryQuitButton;
 
     private Label victoryTimeLabel;
-
 
     private static bool forceStartPlayingOnNextLoad;
     private MenuState currentState;
@@ -73,6 +77,7 @@ public sealed class MenuFlowController : MonoBehaviour
         if (root == null) return;
 
         mainMenuRoot = root.Q<VisualElement>("MainMenuRoot");
+        introRoot = root.Q<VisualElement>(introRootName);
         pauseMenuRoot = root.Q<VisualElement>("PauseMenuRoot");
         victoryMenuRoot = root.Q<VisualElement>("ContactMenuRoot");
 
@@ -108,11 +113,24 @@ public sealed class MenuFlowController : MonoBehaviour
         if (victoryRestartButton != null) victoryRestartButton.clicked -= OnRestartClicked;
         if (victoryQuitButton != null) victoryQuitButton.clicked -= OnQuitToMainMenuClicked;
     }
+
     private void Update()
     {
         if (currentState == MenuState.Playing)
         {
             runTimerSeconds += Time.unscaledDeltaTime;
+        }
+
+        if (currentState == MenuState.Intro)
+        {
+            bool introConfirmPressed =
+                (Keyboard.current != null && Keyboard.current.aKey.wasPressedThisFrame) ||
+                (Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame);
+
+            if (introConfirmPressed)
+                SetState(MenuState.Playing);
+
+            return;
         }
 
         if (currentState == MenuState.MainMenu || currentState == MenuState.Victory)
@@ -140,7 +158,7 @@ public sealed class MenuFlowController : MonoBehaviour
 
     private void OnPlayClicked()
     {
-        SetState(MenuState.Playing);
+        SetState(MenuState.Intro);
     }
 
     private void OnResumeClicked()
@@ -185,11 +203,13 @@ public sealed class MenuFlowController : MonoBehaviour
         currentState = newState;
 
         bool showMain = newState == MenuState.MainMenu;
+        bool showIntro = newState == MenuState.Intro;
         bool showPause = newState == MenuState.Paused;
         bool showVictory = newState == MenuState.Victory;
         bool isPlaying = newState == MenuState.Playing;
 
         SetVisible(mainMenuRoot, showMain);
+        SetVisible(introRoot, showIntro);
         SetVisible(pauseMenuRoot, showPause);
         SetVisible(victoryMenuRoot, showVictory);
 
@@ -208,6 +228,11 @@ public sealed class MenuFlowController : MonoBehaviour
         Time.timeScale = isPlaying ? 1f : 0f;
 
         if (newState == MenuState.MainMenu)
+        {
+            AudioListener.pause = false;
+            backgroundMusic?.PlayMenuMusic();
+        }
+        else if (newState == MenuState.Intro)
         {
             AudioListener.pause = false;
             backgroundMusic?.PlayMenuMusic();
