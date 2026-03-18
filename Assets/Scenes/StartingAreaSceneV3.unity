@@ -16764,6 +16764,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 716527542fd256044abc2e36faee0925, type: 3}
+--- !u!1001 &278304577
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 271413880565636275, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_Name
+      value: Gold Ore (57)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1109.4958
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 16.865
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 975.8982
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
 --- !u!1001 &278641814
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39866,6 +39923,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff0b0a3d7ae7a9e4f8505795785ad853, type: 3}
+--- !u!1001 &648985062
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 271413880565636275, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_Name
+      value: Gold Ore (56)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1013.70483
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 14.599
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1018.52155
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
 --- !u!1001 &649876397
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -40878,6 +40992,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7492970227893232665, guid: 11ef6c955fb624a4aaf3b18597db22df, type: 3}
   m_PrefabInstance: {fileID: 670402010}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &672086044
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 271413880565636275, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_Name
+      value: Gold Ore (52)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1206.4368
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 149.94505
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1331.1628
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
 --- !u!1001 &672491198
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -92848,6 +93019,67 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 022485ff60e4a26418217d8ab778a812, type: 3}
+--- !u!1001 &1502805117
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 271413880565636275, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_Name
+      value: Gold Ore (59)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6884375886617860246, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.41
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1176.8322
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 25.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 954.59717
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
 --- !u!1001 &1503305818
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -99197,6 +99429,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 489919754267896463, guid: 0d7219d25f6a6f94da9f5cbb3abfc2e3, type: 3}
   m_PrefabInstance: {fileID: 1604794139}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1605728060
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 271413880565636275, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_Name
+      value: Gold Ore (54)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 978.98846
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 51.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1075.3088
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
 --- !u!1001 &1606386946
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -108089,6 +108378,63 @@ MonoBehaviour:
   requiredToolNameOverride: 
   verb: Harvest
   destroyOnHarvest: 1
+--- !u!1001 &1745999962
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 271413880565636275, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_Name
+      value: Gold Ore (55)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 964.6975
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 21.897
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1028.6277
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
 --- !u!1001 &1747582960
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -127045,6 +127391,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7992715529498157145, guid: 0cc0db2b14252644da9f1f74ed0c8f90, type: 3}
   m_PrefabInstance: {fileID: 889157009}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2067652372
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 271413880565636275, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_Name
+      value: Gold Ore (53)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1255.4022
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 160.71541
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1247.5002
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
 --- !u!1001 &2067811964
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -132627,6 +133030,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 233d3820a4439794ab8ace97348a5443, type: 3}
+--- !u!1001 &2144930117
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 271413880565636275, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_Name
+      value: Gold Ore (58)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1156.7056
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 31.011
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 973.28937
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235721634452465456, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3c548b2e8a603f84184d7954591701ec, type: 3}
 --- !u!1001 &2145442793
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -133742,3 +134202,11 @@ SceneRoots:
   - {fileID: 1611911243}
   - {fileID: 2112550412}
   - {fileID: 872332698}
+  - {fileID: 672086044}
+  - {fileID: 2067652372}
+  - {fileID: 1605728060}
+  - {fileID: 1745999962}
+  - {fileID: 648985062}
+  - {fileID: 278304577}
+  - {fileID: 2144930117}
+  - {fileID: 1502805117}
