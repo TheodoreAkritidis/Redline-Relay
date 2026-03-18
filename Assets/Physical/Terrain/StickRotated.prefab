@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7344308118163921866}
   - component: {fileID: 9044333527137339992}
   - component: {fileID: 1121348780101791030}
+  - component: {fileID: -7272946812483831833}
   m_Layer: 0
   m_Name: StickRotated
   m_TagString: Untagged
@@ -111,3 +112,26 @@ MonoBehaviour:
   requiredToolNameOverride: 
   verb: Pick up
   destroyOnHarvest: 1
+--- !u!136 &-7272946812483831833
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3940625690359757543}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.10445339
+  m_Height: 1.6700723
+  m_Direction: 1
+  m_Center: {x: 0.00000000958243, y: 0.83503604, z: -0.00000009220571}
