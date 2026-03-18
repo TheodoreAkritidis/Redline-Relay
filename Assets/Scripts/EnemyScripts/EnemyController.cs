@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IInteractable, IAttackable
 {
     [Header("Enemy Reference")]
     [SerializeField] float enemyWanderSpeed = 5f;
     [SerializeField] float enemyChaseSpeed = 5f;
-    [SerializeField] float stopDistance = 2f;
+    [SerializeField] float stopDistance = 5f;
     public float direction = 1f;
     public float wanderRadius = 20f;
     private Vector3 spawnPosition;
@@ -23,7 +23,7 @@ public class EnemyController : MonoBehaviour
     private bool playerDetected = false;
 
     [Header("Attack")]
-    public float attackRange = 2f;
+    public float attackRange = 5f;
     public float attackDamage = 5f;
     public float attackCooldown = 5f; // controls the amount of time before an enemy can attack again
 
@@ -208,6 +208,41 @@ public class EnemyController : MonoBehaviour
     {
         transform.position = spawnPosition;
         ChooseTarget();
+    }
+
+    // IInteractable
+    public string GetPrompt()
+    {
+        return "Attack";
+    }
+
+    public void Interact(GameObject interactor)
+    {
+        // When the player presses the generic interact key while pointing at the enemy,
+        // perform a simple attack using the player's currently selected hotbar item if available,
+        // otherwise use a small default damage.
+        if (interactor == null) return;
+
+        var inv = interactor.GetComponent<PlayerInventoryComponent>();
+        float damage = 5f; // default unarmed/interact damage
+
+        if (inv != null)
+        {
+            var item = inv.GetSelectedHotbarItem();
+            if (item != null && item.isWeapon)
+            {
+                damage = item.WeaponValue;
+            }
+        }
+
+        TakeDamage(damage);
+    }
+
+    // IAttackable
+    public string GetAttackPrompt()
+    {
+        // Popup message for when the player is aiming at the enemy
+        return "F to Attack";
     }
 
 }
