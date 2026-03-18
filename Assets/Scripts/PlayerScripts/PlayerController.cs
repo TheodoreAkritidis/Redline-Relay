@@ -33,6 +33,7 @@ public class SimpleFpsController : MonoBehaviour
 
     [Header("Debug")]
     [SerializeField] private bool showSpeedDebug = true;
+    [SerializeField] private PlayerManager playerManager;
 
     [Header("HUD")]
     [SerializeField] private CrosshairUITK crosshairUI;     // assign HUD object
@@ -83,6 +84,7 @@ public class SimpleFpsController : MonoBehaviour
 
     private void Awake( )
     {
+        if (playerManager == null) playerManager = GetComponent<PlayerManager>();
         if ( crosshairUI == null ) crosshairUI = FindFirstObjectByType<CrosshairUITK>();
         if ( interactor == null ) interactor = GetComponent<Interactor>();
 
@@ -442,6 +444,13 @@ public class SimpleFpsController : MonoBehaviour
     public void OnHotbar9( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(8); }
     public void OnHotbar0( InputValue v ) { if ( !UiBlocked && v.isPressed ) playerInventory?.SetSelectedHotbarIndex(9); }
 
+    public void OnUnstuck(InputValue value)
+    {
+        if (!value.isPressed) return;
+        if (devConsole != null && devConsole.IsOpen) return;
+
+        playerManager?.UnstuckPlayer();
+    }
     private void OnGUI( )
     {
         if ( !showSpeedDebug || rb == null ) return;

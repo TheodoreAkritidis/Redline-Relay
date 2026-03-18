@@ -26,6 +26,7 @@ public sealed class TutorialObjectiveController : MonoBehaviour
         "Hold Shift to sprint (L3), Space to jump (A)\n" +
         "C to craft (down D-pad), E to interact (Y) \n" +
         "Press Tab to view inventory (=)\n\n" +
+        "Press K (up D-pad) to unstuck \n" +
         "First, craft a stone axe and stone pickaxe.";
 
     private const string SmeltingText =

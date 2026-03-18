@@ -75,7 +75,19 @@ public class PlayerManager : MonoBehaviour
         if (playerInventory == null) playerInventory = GetComponent<PlayerInventoryComponent>();
         if (playerRigidbody == null) playerRigidbody = GetComponent<Rigidbody>();
     }
+    public void UnstuckPlayer()
+    {
+        if (respawnPoint == null) return;
 
+        if (playerRigidbody != null)
+        {
+            playerRigidbody.linearVelocity = Vector3.zero;
+            playerRigidbody.angularVelocity = Vector3.zero;
+        }
+
+        transform.position = respawnPoint.position;
+        transform.rotation = respawnPoint.rotation;
+    }
     void ColdDamageCheck( )
     {
         if ( temp > coldThreshold ) return;
