@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -31,7 +32,7 @@ public sealed class InventoryUITKView : MonoBehaviour
     private bool smelterOpen;
     private VisualElement smelterOverlay;
 
-    private SlotView[] smelterBackpackViews; // left grid, like crafting menu
+    private SlotView[] smelterBackpackViews;
     private SlotView smelterOreView;
     private SlotView smelterFuelView;
     private SlotView smelterOutputView;
@@ -44,36 +45,27 @@ public sealed class InventoryUITKView : MonoBehaviour
     private struct RecipeStub
     {
         public string Name;
-        public Texture2D Icon;        // UI Toolkit Image uses Texture2D
-        public string[] Materials;    // up to 4 strings
+        public Texture2D Icon;
+        public string[] Materials;
     }
-
 
     private bool IsAnyMenuOpen => backpackOpen || craftingOpen || smelterOpen;
 
-    // Crafting overlay
     private bool craftingOpen;
     private VisualElement craftingOverlay;
-    private VisualElement craftingInventoryGrid; // left grid container (5x6)
+    private VisualElement craftingInventoryGrid;
     private ScrollView recipeScroll;
     private VisualElement recipeList;
 
-    // Crafting UI - middle panel bits
     private Image craftPreviewIcon;
     private Label craftRecipeNameLabel;
-    private Label[] craftMaterialLabels; // size 4
+    private Label[] craftMaterialLabels;
 
-    // Temporary recipe data
-    //private RecipeStub[] recipeStubs;
-    //private RecipeStub selectedRecipe;
     private CraftingRecipe selectedRecipe;
     private Button craftButton;
 
-
-    // optional: selected recipe highlight
     private VisualElement selectedRecipeEntry;
     public bool IsCraftingOpen => craftingOpen;
-
 
     private VisualElement hotbarAnchor;
     private VisualElement hotbarPanel;
@@ -84,34 +76,37 @@ public sealed class InventoryUITKView : MonoBehaviour
     private bool triedBuildThisFrame;
 
     private VisualElement root;
-    // Crafting overlay
     private SlotView[] craftingViews;
 
-
-
-    // Always-visible hotbar HUD
     private VisualElement hotbarHud;
     private SlotView[] hotbarViews;
 
-    // Backpack overlay
     private VisualElement backpackOverlay;
     private VisualElement backpackGrid;
     private SlotView[] backpackViews;
 
-    // Cursor visual
     private VisualElement cursorRoot;
     private Image cursorIcon;
     private Label cursorQty;
 
-    // Crosshair UI (same UIDocument)
     private VisualElement crosshairRoot;
     private Label crosshairLabel;
 
-    // Tutorial HUD
     private VisualElement tutorialRoot;
     private Label tutorialLabel;
 
     private bool backpackOpen;
+
+    private readonly Dictionary<VisualElement, SlotView> slotLookup = new();
+    private readonly Dictionary<VisualElement, CraftingRecipe> recipeLookup = new();
+
+    private Vector2 _lastPanelPointerPos;
+    private bool _hasPanelPointerPos;
+    private bool _pointerHooked;
+
+    private Vector2 _externalCursorPos;
+    private bool _hasExternalCursorPos;
+
     public void SetCrosshairMessage(string message)
     {
         if (!built || crosshairLabel == null) return;
@@ -120,6 +115,7 @@ public sealed class InventoryUITKView : MonoBehaviour
         crosshairLabel.text = m;
         crosshairLabel.style.fontSize = promptFontSize;
     }
+
     private bool CanBuildNow()
     {
         if (uiDocument == null) return false;
@@ -155,7 +151,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         UnhookModelEvents();
         built = false;
         triedBuildThisFrame = false;
-
     }
 
     private void Update()
@@ -174,8 +169,298 @@ public sealed class InventoryUITKView : MonoBehaviour
         }
 
         if (!IsAnyMenuOpen) return;
+
         UpdateCursorVisual();
         if (smelterOpen) RefreshSmelterStatusText();
+    }
+
+    public void SetExternalCursorPosition(Vector2 panelPosition)
+    {
+        _externalCursorPos = panelPosition;
+        _hasExternalCursorPos = true;
+    }
+
+    public void ClearExternalCursorPosition()
+    {
+        _hasExternalCursorPos = false;
+    }
+
+    public bool HandleGamepadLeftClickAt(Vector2 panelPosition)
+    {
+        if (!built || !IsAnyMenuOpen || root == null) return false;
+        if (playerInventory == null || playerInventory.Model == null) return false;
+
+        SetExternalCursorPosition(panelPosition);
+
+        if (TryGetSlotViewAt(panelPosition, out var directSlot))
+            return HandleLeftClickOnSlot(directSlot);
+
+        var picked = root.panel?.Pick(panelPosition) as VisualElement;
+        if (picked == null)
+        {
+            return TryDropCursorOutsideSafeAreas();
+        }
+
+        if (TryGetRecipeFromElement(picked, out var recipe, out var recipeEntry))
+        {
+            SelectRecipe(recipe, recipeEntry);
+            return true;
+        }
+
+        if (TryGetSlotViewFromElement(picked, out var slotView))
+        {
+            return HandleLeftClickOnSlot(slotView);
+        }
+
+        Button button = FindAncestorButton(picked);
+        if (button != null)
+        {
+            button.Focus();
+            using var evt = NavigationSubmitEvent.GetPooled();
+            evt.target = button;
+            button.SendEvent(evt);
+            return true;
+        }
+
+        return TryDropCursorOutsideSafeAreas(picked);
+    }
+
+    public bool HandleGamepadRightClickAt(Vector2 panelPosition)
+    {
+        if (!built || !IsAnyMenuOpen || root == null) return false;
+        if (playerInventory == null || playerInventory.Model == null) return false;
+
+        SetExternalCursorPosition(panelPosition);
+        if (TryGetSlotViewAt(panelPosition, out var directSlot))
+            return HandleRightClickOnSlot(directSlot);
+        var picked = root.panel?.Pick(panelPosition) as VisualElement;
+        if (picked == null) return false;
+
+        if (TryGetSlotViewFromElement(picked, out var slotView))
+        {
+            return HandleRightClickOnSlot(slotView);
+        }
+
+        return false;
+    }
+
+    private bool HandleLeftClickOnSlot(SlotView view)
+    {
+        if (smelterOpen && smelter != null && view.Container == smelter.Container)
+            return HandleSmelterSlotClick(view, leftClick: true);
+
+        bool changed = InventoryRules.TryLeftClickSlot(
+            playerInventory.Model.Cursor,
+            view.Container,
+            view.Index
+        );
+
+        if (changed)
+            playerInventory.NotifyInventoryChanged();
+
+        return changed;
+    }
+
+    private bool HandleRightClickOnSlot(SlotView view)
+    {
+        if (smelterOpen && smelter != null && view.Container == smelter.Container)
+            return HandleSmelterSlotClick(view, leftClick: false);
+
+        bool changed = InventoryRules.TryRightClickSlot(
+            playerInventory.Model.Cursor,
+            view.Container,
+            view.Index,
+            playerInventory.Model.Backpack
+        );
+
+        if (changed)
+            playerInventory.NotifyInventoryChanged();
+
+        return changed;
+    }
+
+    private bool HandleSmelterSlotClick(SlotView view, bool leftClick)
+    {
+        if (!smelterOpen || smelter == null || playerInventory == null || playerInventory.Model == null)
+            return false;
+
+        SmelterSlotType type;
+        if (view.Index == SmelterComponent.OreSlot) type = SmelterSlotType.Ore;
+        else if (view.Index == SmelterComponent.FuelSlot) type = SmelterSlotType.Fuel;
+        else if (view.Index == SmelterComponent.OutputSlot) type = SmelterSlotType.Output;
+        else return false;
+
+        var cursor = playerInventory.Model.Cursor;
+
+        bool changed = false;
+
+        bool cursorHasItem = cursor != null && cursor.HasItem;
+        ItemDefinition heldItem = cursorHasItem ? cursor.CursorStack.Item : null;
+
+        bool CanAcceptHeldIntoThisSlot()
+        {
+            if (!cursorHasItem || heldItem == null) return false;
+            if (type == SmelterSlotType.Output) return false;
+
+            if (type == SmelterSlotType.Ore)
+                return heldItem.IsOre && heldItem.SmeltResult != null && heldItem.SmeltSecondsPerItem > 0f;
+
+            if (type == SmelterSlotType.Fuel)
+                return heldItem.IsFuel && heldItem.FuelSeconds > 0f;
+
+            return false;
+        }
+
+        if (leftClick)
+        {
+            if (!cursorHasItem)
+            {
+                changed = InventoryRules.TryPickUpStack(cursor, view.Container, view.Index);
+            }
+            else
+            {
+                if (!CanAcceptHeldIntoThisSlot())
+                    return false;
+
+                changed = InventoryRules.TryDropCursorStack(cursor, view.Container, view.Index);
+            }
+        }
+        else
+        {
+            if (type == SmelterSlotType.Output)
+            {
+                if (!cursorHasItem)
+                    changed = InventoryRules.TryPickUpStack(cursor, view.Container, view.Index);
+                else
+                    return false;
+            }
+            else
+            {
+                if (!cursorHasItem)
+                {
+                    changed = InventoryRules.TrySplitStackToBackpack(
+                        view.Container,
+                        view.Index,
+                        playerInventory.Model.Backpack
+                    );
+                }
+                else
+                {
+                    if (!CanAcceptHeldIntoThisSlot())
+                        return false;
+
+                    changed = InventoryRules.TryPlaceOneFromCursor(cursor, view.Container, view.Index);
+                }
+            }
+        }
+
+        if (changed)
+        {
+            playerInventory.NotifyInventoryChanged();
+            smelter.NotifyChanged();
+        }
+
+        return changed;
+    }
+
+    private bool TryDropCursorOutsideSafeAreas(VisualElement picked = null)
+    {
+        if (playerInventory == null || playerInventory.Model == null) return false;
+        if (!playerInventory.Model.Cursor.HasItem) return false;
+
+        if (picked != null)
+        {
+            if (IsInsideInventorySlot(picked)) return false;
+            if (IsInsideInventoryPanel(picked)) return false;
+            if (IsInsideHotbarPanel(picked)) return false;
+        }
+
+        ItemStack dropped = InventoryRules.DropCursorToWorld(playerInventory.Model.Cursor);
+
+        var spawner = FindFirstObjectByType<WorldItemSpawner>();
+        if (spawner != null)
+        {
+            spawner.SpawnAtFeet(dropped, playerInventory.transform);
+        }
+        else
+        {
+            Debug.LogWarning("No WorldItemSpawner found in scene.");
+        }
+
+        playerInventory.NotifyInventoryChanged();
+        return true;
+    }
+
+    private bool TryGetSlotViewFromElement(VisualElement ve, out SlotView view)
+    {
+        while (ve != null)
+        {
+            if (slotLookup.TryGetValue(ve, out view))
+                return true;
+
+            ve = ve.parent;
+        }
+
+        view = default;
+        return false;
+    }
+
+    private bool TryGetRecipeFromElement(VisualElement ve, out CraftingRecipe recipe, out VisualElement recipeEntry)
+    {
+        while (ve != null)
+        {
+            if (recipeLookup.TryGetValue(ve, out recipe))
+            {
+                recipeEntry = FindAncestorWithClass(ve, "recipe-entry") ?? ve;
+                return true;
+            }
+
+            ve = ve.parent;
+        }
+
+        recipe = null;
+        recipeEntry = null;
+        return false;
+    }
+
+    private static VisualElement FindAncestorWithClass(VisualElement ve, string className)
+    {
+        while (ve != null)
+        {
+            if (ve.ClassListContains(className))
+                return ve;
+
+            ve = ve.parent;
+        }
+
+        return null;
+    }
+
+    private static Button FindAncestorButton(VisualElement ve)
+    {
+        while (ve != null)
+        {
+            if (ve is Button b)
+                return b;
+
+            ve = ve.parent;
+        }
+
+        return null;
+    }
+
+    private void SelectRecipe(CraftingRecipe recipe, VisualElement entry)
+    {
+        if (recipe == null || entry == null) return;
+
+        if (selectedRecipeEntry != null)
+            SetBorder(selectedRecipeEntry, new Color(0, 0, 0, 0.75f));
+
+        selectedRecipeEntry = entry;
+        SetBorder(selectedRecipeEntry, new Color(1f, 0.9f, 0.2f, 1f));
+
+        selectedRecipe = recipe;
+        RefreshSelectedRecipeUI();
     }
 
     public void SetSmelterOpen(bool open)
@@ -187,7 +472,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         if (smelterOverlay != null)
             smelterOverlay.style.display = smelterOpen ? DisplayStyle.Flex : DisplayStyle.None;
 
-        // Hide crosshair whenever ANY UI is open
         SetCrosshairVisible(!(backpackOpen || craftingOpen || smelterOpen));
 
         if (!smelterOpen && playerInventory != null && playerInventory.Model != null)
@@ -204,7 +488,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         if (backpackOverlay != null)
             backpackOverlay.style.display = backpackOpen ? DisplayStyle.Flex : DisplayStyle.None;
 
-        // Hide crosshair whenever inventory/backpack is open
         SetCrosshairVisible(!backpackOpen);
 
         if (!backpackOpen && playerInventory != null && playerInventory.Model != null)
@@ -213,7 +496,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         RefreshAll();
     }
 
-    // Called by PlayerInteractor
     public void SetCrosshairDefault()
     {
         if (!built || crosshairLabel == null) return;
@@ -221,7 +503,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         crosshairLabel.style.fontSize = crosshairFontSize;
     }
 
-    // Called by PlayerInteractor
     public void SetCrosshairPrompt(string action)
     {
         if (!built || crosshairLabel == null) return;
@@ -271,14 +552,16 @@ public sealed class InventoryUITKView : MonoBehaviour
         if (root == null) return;
 
         root.Clear();
+        slotLookup.Clear();
+        recipeLookup.Clear();
+        _pointerHooked = false;
+        _hasPanelPointerPos = false;
 
         root.style.position = Position.Relative;
         root.style.width = Length.Percent(100);
         root.style.height = Length.Percent(100);
         root.pickingMode = PickingMode.Ignore;
 
-        
-        
         BuildBackpackOverlay();
         BuildCraftingOverlay();
         BuildSmelterOverlay();
@@ -291,12 +574,12 @@ public sealed class InventoryUITKView : MonoBehaviour
             backpackOverlay.style.display = backpackOpen ? DisplayStyle.Flex : DisplayStyle.None;
         if (craftingOverlay != null)
             craftingOverlay.style.display = craftingOpen ? DisplayStyle.Flex : DisplayStyle.None;
+        if (smelterOverlay != null)
+            smelterOverlay.style.display = smelterOpen ? DisplayStyle.Flex : DisplayStyle.None;
 
         SetCrosshairVisible(!backpackOpen);
         SetCrosshairDefault();
     }
-
-    //------------------------------ Tutorial -------------------------------
 
     public void SetTutorialText(string message)
     {
@@ -349,9 +632,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         tutorialRoot.Add(tutorialLabel);
     }
 
-
-    //---------------------------------- START OF SMELTER -----------------------------------
-
     private void BuildSmelterOverlay()
     {
         if (playerInventory == null || playerInventory.Model == null) return;
@@ -371,24 +651,22 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         root.Add(smelterOverlay);
 
-        // Main panel container (centered)
-        var panel = MakePanel(); // IMPORTANT: this gives "inventory-panel" class used by anti-drop logic
+        var panel = MakePanel();
         panel.style.width = 860;
-        panel.style.height = 520;              // was 420 (gives the grid proper bottom breathing room)
+        panel.style.height = 520;
         panel.style.justifyContent = Justify.Center;
         panel.style.alignItems = Align.Center;
-        panel.style.paddingTop = 24;           // a bit more breathing room
+        panel.style.paddingTop = 24;
         panel.style.paddingBottom = 28;
 
         smelterOverlay.Add(panel);
 
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
-        row.style.alignItems = Align.Center;   // keeps both panels centered vertically within the main panel
+        row.style.alignItems = Align.Center;
         row.style.justifyContent = Justify.Center;
         panel.Add(row);
 
-        // ---------- LEFT: Backpack grid (same as crafting menu style 5x6) ----------
         var leftPanel = MakePanel();
         leftPanel.style.width = 340;
         leftPanel.style.height = 440;
@@ -418,16 +696,14 @@ public sealed class InventoryUITKView : MonoBehaviour
             grid.Add(v.Root);
         }
 
-        // ---------- RIGHT: Smelter panel ----------
         var rightPanel = MakePanel();
         rightPanel.style.width = 420;
-        rightPanel.style.height = 440;         // was 360
+        rightPanel.style.height = 440;
         rightPanel.style.alignItems = Align.Center;
-        rightPanel.style.justifyContent = Justify.Center;   // THIS is what moves the smelter UI down into the middle
+        rightPanel.style.justifyContent = Justify.Center;
         rightPanel.RegisterCallback<PointerUpEvent>(OnPanelPointerUp, TrickleDown.TrickleDown);
         row.Add(rightPanel);
 
-        // Top row: Ore [ ]  ->  Output [ ]
         var topRow = new VisualElement();
         topRow.style.flexDirection = FlexDirection.Row;
         topRow.style.alignItems = Align.Center;
@@ -435,12 +711,10 @@ public sealed class InventoryUITKView : MonoBehaviour
         topRow.style.marginTop = 0;
         rightPanel.Add(topRow);
 
-        // Ore slot (filtered)
         smelterOreView = CreateSlotView(smelter.Container, SmelterComponent.OreSlot, allowClicks: false, isLastInRow: false);
         smelterOreView.Root.RegisterCallback<PointerDownEvent>(evt => OnSmelterSlotPointerDown(evt, smelterOreView, SmelterSlotType.Ore));
         topRow.Add(smelterOreView.Root);
 
-        // ASCII arrow to avoid weird unicode
         var arrow = new Label("->");
         arrow.style.fontSize = 30;
         arrow.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -449,19 +723,16 @@ public sealed class InventoryUITKView : MonoBehaviour
         arrow.style.color = new Color(0.9f, 0.9f, 0.2f, 1f);
         topRow.Add(arrow);
 
-        // Output slot (read-only for incoming)
         smelterOutputView = CreateSlotView(smelter.Container, SmelterComponent.OutputSlot, allowClicks: false, isLastInRow: true);
         smelterOutputView.Root.RegisterCallback<PointerDownEvent>(evt => OnSmelterSlotPointerDown(evt, smelterOutputView, SmelterSlotType.Output));
         topRow.Add(smelterOutputView.Root);
 
-        // Stack timer label
         smeltStackTimeLabel = new Label("Time till stack is smelted: 00:00");
         smeltStackTimeLabel.style.marginTop = 14;
         smeltStackTimeLabel.style.color = Color.white;
         smeltStackTimeLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
         rightPanel.Add(smeltStackTimeLabel);
 
-        // Fuel slot centered
         var fuelRow = new VisualElement();
         fuelRow.style.flexDirection = FlexDirection.Row;
         fuelRow.style.alignItems = Align.Center;
@@ -486,7 +757,6 @@ public sealed class InventoryUITKView : MonoBehaviour
     {
         if (!IsAnyMenuOpen) return;
         if (!smelterOpen) return;
-
         if (playerInventory == null || playerInventory.Model == null) return;
 
         var cursor = playerInventory.Model.Cursor;
@@ -510,29 +780,24 @@ public sealed class InventoryUITKView : MonoBehaviour
             return false;
         }
 
-        // LEFT CLICK
         if (evt.button == (int)MouseButton.LeftMouse)
         {
             if (!cursorHasItem)
             {
-                // Pick up full stack from that slot
                 changed = InventoryRules.TryPickUpStack(cursor, view.Container, view.Index);
             }
             else
             {
-                // Drop/merge rules BUT filtered + output is read-only for incoming
                 if (!CanAcceptHeldIntoThisSlot())
                     return;
 
                 changed = InventoryRules.TryDropCursorStack(cursor, view.Container, view.Index);
             }
         }
-        // RIGHT CLICK
         else if (evt.button == (int)MouseButton.RightMouse)
         {
             if (type == SmelterSlotType.Output)
             {
-                // Output slot: no placing. Right-click behaves like pickup (no “split to backpack”).
                 if (!cursorHasItem)
                     changed = InventoryRules.TryPickUpStack(cursor, view.Container, view.Index);
                 else
@@ -542,7 +807,6 @@ public sealed class InventoryUITKView : MonoBehaviour
             {
                 if (!cursorHasItem)
                 {
-                    // Keep consistent with inventory: right-click splits stack to backpack.
                     changed = InventoryRules.TrySplitStackToBackpack(view.Container, view.Index, playerInventory.Model.Backpack);
                 }
                 else
@@ -567,7 +831,6 @@ public sealed class InventoryUITKView : MonoBehaviour
     {
         if (!built || !smelterOpen || smelter == null) return;
 
-        // Smelt countdown (per item)
         if (smelter.TryGetCurrentSmeltTimes(out float perItem, out float remainingThisItem))
         {
             smeltStackTimeLabel.text =
@@ -578,7 +841,6 @@ public sealed class InventoryUITKView : MonoBehaviour
             smeltStackTimeLabel.text = "Smelting: 00:00   (per item: 00:00)";
         }
 
-        // Fuel countdown: show remaining burn time currently loaded + fuel stack total time
         float fuelTotal = smelter.GetTotalFuelTimeSeconds();
         fuelTimeLabel.text = $"Fuel time left: {FormatMMSS(fuelTotal)}";
     }
@@ -594,14 +856,11 @@ public sealed class InventoryUITKView : MonoBehaviour
 
     private enum SmelterSlotType { Ore, Fuel, Output }
 
-    //---------------------------------- END OF SMELTER -----------------------------------
-
     private void BuildCraftingOverlay()
     {
         var model = playerInventory?.Model;
         if (model == null) return;
 
-        // Full-screen dark overlay
         craftingOverlay = new VisualElement();
         craftingOverlay.style.position = Position.Absolute;
         craftingOverlay.style.left = 0;
@@ -615,16 +874,14 @@ public sealed class InventoryUITKView : MonoBehaviour
         root.Add(craftingOverlay);
         craftingOverlay.RegisterCallback<PointerUpEvent>(OnOverlayPointerUp, TrickleDown.TrickleDown);
 
-        // Center row that holds the three panels
         var row = new VisualElement();
         row.style.flexDirection = FlexDirection.Row;
         row.style.justifyContent = Justify.Center;
         row.style.alignItems = Align.Center;
         craftingOverlay.Add(row);
 
-        // -------- LEFT PANEL (5x6 grid) --------
         var leftPanel = MakePanel();
-        leftPanel.style.marginRight = 18; // replaces row gap
+        leftPanel.style.marginRight = 18;
         leftPanel.RegisterCallback<PointerUpEvent>(OnPanelPointerUp, TrickleDown.TrickleDown);
         row.Add(leftPanel);
 
@@ -640,7 +897,6 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         leftPanel.Add(craftingInventoryGrid);
 
-        // Inventory slots
         int slotsToShow = Mathf.Min(craftCols * craftRows, model.Backpack.SlotCount);
         craftingViews = new SlotView[slotsToShow];
 
@@ -653,8 +909,6 @@ public sealed class InventoryUITKView : MonoBehaviour
             craftingInventoryGrid.Add(v.Root);
         }
 
-
-        // -------- MIDDLE PANEL (preview + name + materials + button) --------
         var midPanel = MakePanel();
         midPanel.style.width = 260;
         midPanel.style.alignItems = Align.Center;
@@ -662,7 +916,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         midPanel.RegisterCallback<PointerUpEvent>(OnPanelPointerUp, TrickleDown.TrickleDown);
         row.Add(midPanel);
 
-        // Preview box
         var previewBox = new VisualElement();
         previewBox.style.width = 120;
         previewBox.style.height = 120;
@@ -674,21 +927,18 @@ public sealed class InventoryUITKView : MonoBehaviour
         SetBorder(previewBox, new Color(0, 0, 0, 0.75f));
         midPanel.Add(previewBox);
 
-        // Icon inside preview box
         craftPreviewIcon = new Image();
         craftPreviewIcon.style.width = Length.Percent(100);
         craftPreviewIcon.style.height = Length.Percent(100);
         craftPreviewIcon.scaleMode = ScaleMode.ScaleToFit;
         previewBox.Add(craftPreviewIcon);
 
-        // Recipe name label
         craftRecipeNameLabel = new Label("Select a recipe");
         craftRecipeNameLabel.style.marginTop = 10;
         craftRecipeNameLabel.style.unityTextAlign = TextAnchor.UpperCenter;
         craftRecipeNameLabel.style.color = Color.white;
         midPanel.Add(craftRecipeNameLabel);
 
-        // Materials list (up to 4)
         var matsContainer = new VisualElement();
         matsContainer.style.marginTop = 8;
         matsContainer.style.alignSelf = Align.Stretch;
@@ -712,9 +962,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         craftButton.SetEnabled(false);
         midPanel.Add(craftButton);
 
-
-
-        // -------- RIGHT PANEL (scrollable recipe list) --------
         var rightPanel = MakePanel();
         rightPanel.style.width = 320;
         rightPanel.style.height = 360;
@@ -744,18 +991,16 @@ public sealed class InventoryUITKView : MonoBehaviour
             }
         }
 
-        // Default hidden unless already open
         craftingOverlay.style.display = craftingOpen ? DisplayStyle.Flex : DisplayStyle.None;
     }
+
     private void OnCraftPressed()
     {
         if (playerInventory == null || playerInventory.Model == null) return;
         if (selectedRecipe == null) return;
 
-        // Must have no cursor item (optional rule, but recommended)
         if (playerInventory.Model.Cursor.HasItem) return;
 
-        // Check + consume ingredients from hotbar+backpack (so crafting works no matter where mats are)
         var hotbar = playerInventory.Model.Hotbar;
         var backpack = playerInventory.Model.Backpack;
 
@@ -763,7 +1008,7 @@ public sealed class InventoryUITKView : MonoBehaviour
         {
             if (ing.Item == null || ing.Amount <= 0) continue;
             int have = InventoryRules.CountItem(hotbar, backpack, ing.Item);
-            if (have < ing.Amount) return; // not enough
+            if (have < ing.Amount) return;
         }
 
         foreach (var ing in selectedRecipe.Ingredients)
@@ -772,21 +1017,18 @@ public sealed class InventoryUITKView : MonoBehaviour
             InventoryRules.TryConsume(hotbar, backpack, ing.Item, ing.Amount);
         }
 
-        // Add output (auto-add uses hotbar first then backpack, new stacks in backpack)
         var outItem = selectedRecipe.OutputItem;
         int outAmt = Mathf.Max(1, selectedRecipe.OutputAmount);
         int rem = InventoryRules.TryAutoAdd(outItem, outAmt, hotbar, backpack);
 
-        // If rem > 0, you can decide what to do (drop it to world, etc). For now ignore.
         playerInventory.NotifyInventoryChanged();
-
-        // Refresh requirement text + button enabled state
         RefreshSelectedRecipeUI();
     }
+
     private VisualElement MakePanel()
     {
         var panel = new VisualElement();
-        panel.AddToClassList("inv-panel"); 
+        panel.AddToClassList("inv-panel");
         panel.style.backgroundColor = new Color(0.12f, 0.12f, 0.12f, 0.95f);
         panel.style.paddingLeft = 16;
         panel.style.paddingRight = 16;
@@ -802,6 +1044,7 @@ public sealed class InventoryUITKView : MonoBehaviour
     private VisualElement MakeRecipeEntry(CraftingRecipe recipe)
     {
         var entry = new VisualElement();
+        entry.AddToClassList("recipe-entry");
         entry.style.flexDirection = FlexDirection.Row;
         entry.style.alignItems = Align.Center;
         entry.style.height = 64;
@@ -830,20 +1073,18 @@ public sealed class InventoryUITKView : MonoBehaviour
         label.style.marginLeft = 10;
         entry.Add(label);
 
+        recipeLookup[entry] = recipe;
+        recipeLookup[icon] = recipe;
+        recipeLookup[label] = recipe;
+
         entry.RegisterCallback<PointerDownEvent>(_ =>
         {
-            if (selectedRecipeEntry != null)
-                SetBorder(selectedRecipeEntry, new Color(0, 0, 0, 0.75f));
-
-            selectedRecipeEntry = entry;
-            SetBorder(entry, new Color(1f, 0.9f, 0.2f, 1f));
-
-            selectedRecipe = recipe;
-            RefreshSelectedRecipeUI();
+            SelectRecipe(recipe, entry);
         });
 
         return entry;
     }
+
     private void RefreshSelectedRecipeUI()
     {
         if (craftRecipeNameLabel == null || craftPreviewIcon == null || craftMaterialLabels == null) return;
@@ -895,6 +1136,7 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         craftButton?.SetEnabled(canCraft);
     }
+
     private static void SetBorder(VisualElement ve, Color c)
     {
         ve.style.borderTopColor = c;
@@ -902,7 +1144,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         ve.style.borderBottomColor = c;
         ve.style.borderLeftColor = c;
     }
-
 
     public void SetCraftingOpen(bool open)
     {
@@ -912,23 +1153,19 @@ public sealed class InventoryUITKView : MonoBehaviour
         if (craftingOverlay != null)
             craftingOverlay.style.display = craftingOpen ? DisplayStyle.Flex : DisplayStyle.None;
 
-        // Hide crosshair whenever ANY UI is open
         SetCrosshairVisible(!(backpackOpen || craftingOpen || smelterOpen));
 
-        // If closing crafting, return cursor item like inventory does
         if (!craftingOpen && playerInventory != null && playerInventory.Model != null)
             InventoryRules.CancelCursorToOrigin(playerInventory.Model.Cursor);
 
         RefreshAll();
     }
 
-
     private void BuildCrosshairHud()
     {
         crosshairRoot = new VisualElement();
         crosshairRoot.pickingMode = PickingMode.Ignore;
 
-        // Full-screen overlay that centers its children.
         crosshairRoot.style.position = Position.Absolute;
         crosshairRoot.style.left = 0;
         crosshairRoot.style.right = 0;
@@ -943,7 +1180,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         crosshairLabel = new Label(idleCrosshairGlyph);
         crosshairLabel.pickingMode = PickingMode.Ignore;
 
-        // True center alignment (no background box)
         crosshairLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
         crosshairLabel.style.whiteSpace = WhiteSpace.Normal;
         crosshairLabel.style.color = Color.white;
@@ -953,10 +1189,8 @@ public sealed class InventoryUITKView : MonoBehaviour
         crosshairRoot.Add(crosshairLabel);
     }
 
-
     private void BuildHotbarHud()
     {
-        // Outer container spans the screen width and centers its child.
         hotbarAnchor = new VisualElement();
         hotbarAnchor.style.position = Position.Absolute;
         hotbarAnchor.style.left = 0;
@@ -967,25 +1201,19 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         root.Add(hotbarAnchor);
 
-        // A padded panel around the hotbar that counts as "safe drop area"
         hotbarPanel = new VisualElement();
         hotbarPanel.AddToClassList("hotbar-panel");
         hotbarPanel.style.flexDirection = FlexDirection.Row;
         hotbarPanel.style.justifyContent = Justify.Center;
         hotbarPanel.style.alignItems = Align.Center;
-
-        // "buffer" around the slots so dropping there does nothing
         hotbarPanel.style.paddingLeft = 10;
         hotbarPanel.style.paddingRight = 10;
         hotbarPanel.style.paddingTop = 10;
         hotbarPanel.style.paddingBottom = 10;
-
-        // optional subtle background (you can remove if you want it invisible)
         hotbarPanel.style.backgroundColor = new Color(0, 0, 0, 0.0f);
 
         hotbarAnchor.Add(hotbarPanel);
 
-        // Inner container is the actual hotbar row with a fixed width.
         hotbarHud = new VisualElement();
         hotbarHud.style.flexDirection = FlexDirection.Row;
         hotbarHud.style.flexWrap = Wrap.NoWrap;
@@ -1001,8 +1229,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         for (int i = 0; i < hotbarCount; i++)
         {
             bool isLastInRow = (i == hotbarCount - 1);
-
-            // IMPORTANT: allowClicks true so hotbar accepts drops while inventory is open
             var v = CreateSlotView(model.Hotbar, i, allowClicks: true, isLastInRow: isLastInRow);
 
             hotbarViews[i] = v;
@@ -1020,8 +1246,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         }
         return false;
     }
-
-
 
     private void BuildBackpackOverlay()
     {
@@ -1083,7 +1307,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         if (playerInventory == null || playerInventory.Model == null) return;
         if (!playerInventory.Model.Cursor.HasItem) return;
 
-        // inside the gray panel => never drop
         evt.StopPropagation();
     }
 
@@ -1174,6 +1397,10 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         var view = new SlotView(container, index, slot, icon, qty);
 
+        slotLookup[slot] = view;
+        slotLookup[icon] = view;
+        slotLookup[qty] = view;
+
         slot.RegisterCallback<PointerEnterEvent>(_ => slot.style.backgroundColor = new Color(0.22f, 0.22f, 0.22f, 1f));
         slot.RegisterCallback<PointerLeaveEvent>(_ => slot.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.9f));
 
@@ -1209,23 +1436,16 @@ public sealed class InventoryUITKView : MonoBehaviour
         if (playerInventory == null || playerInventory.Model == null) return;
         if (!playerInventory.Model.Cursor.HasItem) return;
 
-        // IMPORTANT: evt.target will often be the overlay (because of trickle-down).
-        // We need the element actually under the pointer.
         var picked = root?.panel?.Pick(evt.position) as VisualElement;
 
-        // If pointer-up happened on a slot (or a child), don't drop.
         if (IsInsideInventorySlot(picked))
             return;
 
-        // If pointer-up happened inside the gray inventory panel (including gaps), don't drop.
         if (IsInsideInventoryPanel(picked))
             return;
 
-        // If pointer-up happened inside the hotbar safe area, don't drop.
         if (IsInsideHotbarPanel(picked))
             return;
-
-        // Otherwise: released outside -> drop to world.
 
         ItemStack dropped = InventoryRules.DropCursorToWorld(playerInventory.Model.Cursor);
 
@@ -1240,7 +1460,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         }
 
         playerInventory.NotifyInventoryChanged();
-
     }
 
     private static bool IsInsideInventoryPanel(VisualElement ve)
@@ -1284,12 +1503,10 @@ public sealed class InventoryUITKView : MonoBehaviour
                 if (craftingViews[i].IsValid)
                     RefreshSlot(craftingViews[i]);
 
-        // Refresh smelter storage slots (ore/fuel/output)
         if (smelterOreView.IsValid) RefreshSlot(smelterOreView);
         if (smelterFuelView.IsValid) RefreshSlot(smelterFuelView);
         if (smelterOutputView.IsValid) RefreshSlot(smelterOutputView);
 
-        // Refresh smelter backpack grid (left panel)
         if (smelterBackpackViews != null)
             for (int i = 0; i < smelterBackpackViews.Length; i++)
                 if (smelterBackpackViews[i].IsValid)
@@ -1335,10 +1552,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         }
     }
 
-    private Vector2 _lastPanelPointerPos;
-    private bool _hasPanelPointerPos;
-    private bool _pointerHooked;
-
     private void UpdateCursorVisual(bool force = false)
     {
         if (!built || cursorRoot == null || root == null) return;
@@ -1352,19 +1565,16 @@ public sealed class InventoryUITKView : MonoBehaviour
             return;
         }
 
-        // Hook once: capture pointer position in PANEL space (no Y inversion, no scaling offsets).
         if (!_pointerHooked)
         {
             _pointerHooked = true;
 
-            // TrickleDown so we still get move events when hovering child elements (slots, panels, etc.)
             root.RegisterCallback<PointerMoveEvent>(e =>
             {
-                _lastPanelPointerPos = e.position;   // panel coords (top-left origin)
+                _lastPanelPointerPos = e.position;
                 _hasPanelPointerPos = true;
             }, TrickleDown.TrickleDown);
 
-            // Also update on pointer down so the icon snaps instantly when you click a slot
             root.RegisterCallback<PointerDownEvent>(e =>
             {
                 _lastPanelPointerPos = e.position;
@@ -1372,16 +1582,24 @@ public sealed class InventoryUITKView : MonoBehaviour
             }, TrickleDown.TrickleDown);
         }
 
-        if (!_hasPanelPointerPos)
+        Vector2 cursorPos;
+
+        if (_hasExternalCursorPos)
         {
-            // No pointer data yet; hide until we get a move/down event
+            cursorPos = _externalCursorPos;
+        }
+        else if (_hasPanelPointerPos)
+        {
+            cursorPos = _lastPanelPointerPos;
+        }
+        else
+        {
             cursorContainer.style.display = DisplayStyle.None;
             return;
         }
 
-        // Position the held icon centered on the pointer
-        cursorContainer.style.left = _lastPanelPointerPos.x - slotSize.x * 0.5f;
-        cursorContainer.style.top = _lastPanelPointerPos.y - slotSize.y * 0.5f;
+        cursorContainer.style.left = cursorPos.x - slotSize.x * 0.5f;
+        cursorContainer.style.top = cursorPos.y - slotSize.y * 0.5f;
 
         if (!playerInventory.Model.Cursor.HasItem)
         {
@@ -1397,7 +1615,6 @@ public sealed class InventoryUITKView : MonoBehaviour
         cursorIcon.image = held.Item.Icon != null ? held.Item.Icon.texture : null;
         cursorQty.text = held.Quantity > 1 ? held.Quantity.ToString() : "";
     }
-
 
     private readonly struct SlotView
     {
@@ -1418,4 +1635,65 @@ public sealed class InventoryUITKView : MonoBehaviour
             Qty = qty;
         }
     }
+
+    //gamepad bs
+
+
+
+    private static bool TryHitSlotArray(SlotView[] views, Vector2 panelPosition, out SlotView hit)
+    {
+        if (views != null)
+        {
+            for (int i = 0; i < views.Length; i++)
+            {
+                if (!views[i].IsValid) continue;
+                if (views[i].Root.resolvedStyle.display == DisplayStyle.None) continue;
+
+                if (views[i].Root.worldBound.Contains(panelPosition))
+                {
+                    hit = views[i];
+                    return true;
+                }
+            }
+        }
+
+        hit = default;
+        return false;
+    }
+
+    private bool TryGetSlotViewAt(Vector2 panelPosition, out SlotView hit)
+    {
+        if (TryHitSlotArray(hotbarViews, panelPosition, out hit)) return true;
+
+        if (backpackOpen && TryHitSlotArray(backpackViews, panelPosition, out hit)) return true;
+        if (craftingOpen && TryHitSlotArray(craftingViews, panelPosition, out hit)) return true;
+        if (smelterOpen && TryHitSlotArray(smelterBackpackViews, panelPosition, out hit)) return true;
+
+        if (smelterOpen)
+        {
+            if (smelterOreView.IsValid && smelterOreView.Root.worldBound.Contains(panelPosition))
+            {
+                hit = smelterOreView;
+                return true;
+            }
+
+            if (smelterFuelView.IsValid && smelterFuelView.Root.worldBound.Contains(panelPosition))
+            {
+                hit = smelterFuelView;
+                return true;
+            }
+
+            if (smelterOutputView.IsValid && smelterOutputView.Root.worldBound.Contains(panelPosition))
+            {
+                hit = smelterOutputView;
+                return true;
+            }
+        }
+
+        hit = default;
+        return false;
+    }
+
+
+
 }

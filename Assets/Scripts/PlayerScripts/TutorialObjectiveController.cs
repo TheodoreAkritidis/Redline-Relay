@@ -22,9 +22,10 @@ public sealed class TutorialObjectiveController : MonoBehaviour
 
     private const string IntroText =
         "Press Esc to pause or leave any menu\n" +
-        "W, A, S, D to move (left gamepad stick), \n" +
-        "hold Shift to sprint (L3), Space to jump (A)\n" +
-        "C to craft (=), E to interact (Y) \n\n" +
+        "W, A, S, D to move (left gamepad stick) \n" +
+        "Hold Shift to sprint (L3), Space to jump (A)\n" +
+        "C to craft (down D-pad), E to interact (Y) \n" +
+        "Press Tab to view inventory (=)\n\n" +
         "First, craft a stone axe and stone pickaxe.";
 
     private const string SmeltingText =

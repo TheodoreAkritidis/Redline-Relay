@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e142bc91933ed6489a7a272a015326f, type: 3}
   m_Name: recipe_coil
   m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipe
-  DisplayName: 
+  DisplayName: Coil
   OutputItem: {fileID: 0}
   OutputAmount: 1
   Ingredients:

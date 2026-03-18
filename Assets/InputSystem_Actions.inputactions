@@ -239,6 +239,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "alternateAction",
+                    "type": "Button",
+                    "id": "41dc16c1-7dfe-4eb9-970c-b0fcd7a5fe61",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -844,6 +853,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "HotbarNext",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1cd196a2-90d7-4e7a-afb9-f922d15865bd",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "alternateAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
