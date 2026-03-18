@@ -108,7 +108,6 @@ public sealed class MenuFlowController : MonoBehaviour
         if (victoryRestartButton != null) victoryRestartButton.clicked -= OnRestartClicked;
         if (victoryQuitButton != null) victoryQuitButton.clicked -= OnQuitToMainMenuClicked;
     }
-
     private void Update()
     {
         if (currentState == MenuState.Playing)
@@ -119,16 +118,17 @@ public sealed class MenuFlowController : MonoBehaviour
         if (currentState == MenuState.MainMenu || currentState == MenuState.Victory)
             return;
 
-        if (Keyboard.current == null)
+        bool pausePressed =
+            (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) ||
+            (Gamepad.current != null && Gamepad.current.selectButton.wasPressedThisFrame);
+
+        if (!pausePressed)
             return;
 
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            if (currentState == MenuState.Playing)
-                SetState(MenuState.Paused);
-            else if (currentState == MenuState.Paused)
-                SetState(MenuState.Playing);
-        }
+        if (currentState == MenuState.Playing)
+            SetState(MenuState.Paused);
+        else if (currentState == MenuState.Paused)
+            SetState(MenuState.Playing);
     }
 
     public void ShowVictory()

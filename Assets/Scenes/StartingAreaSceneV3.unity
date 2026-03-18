@@ -17573,6 +17573,22 @@ MonoBehaviour:
   recipes:
   - {fileID: 11400000, guid: 5e94f120faec41e428ae3836d1b38547, type: 2}
   - {fileID: 11400000, guid: d6646910c24c8b048b85c4cc92c5e09b, type: 2}
+  - {fileID: 11400000, guid: ec2a11dc15ac9f84e8a7b7562b0215cf, type: 2}
+  - {fileID: 11400000, guid: fcfe483547b7e7b4ba5eb6443d8b861d, type: 2}
+  - {fileID: 11400000, guid: 5d21b002fab21d04481234ad3839281e, type: 2}
+  - {fileID: 11400000, guid: 9a0efa9c2df066442a1a3f798bdec8b5, type: 2}
+  - {fileID: 11400000, guid: 3fd2174b28e73b54ab780eeda2e90560, type: 2}
+  - {fileID: 11400000, guid: 471f83dc2ea44dc4498a39c87197f9a5, type: 2}
+  - {fileID: 11400000, guid: 3e5807fb7d875b946a5f4936cb03d90f, type: 2}
+  - {fileID: 11400000, guid: d6d31f8201549114587265ec2cece1d6, type: 2}
+  - {fileID: 11400000, guid: 5f4b652570aa46143a463b32ed358130, type: 2}
+  - {fileID: 11400000, guid: 65c0212f355abbc42b335ace3a70edd1, type: 2}
+  - {fileID: 11400000, guid: 1b6660e679587e24b97912184e43134c, type: 2}
+  - {fileID: 11400000, guid: d6646910c24c8b048b85c4cc92c5e09b, type: 2}
+  - {fileID: 11400000, guid: b7c21d8b5a191dc40948535baa336b29, type: 2}
+  - {fileID: 11400000, guid: fedb0ba0f26bf034fafc171405f77f7f, type: 2}
+  - {fileID: 11400000, guid: e93de910591764945afc89dfcd5fcf6c, type: 2}
+  - {fileID: 11400000, guid: b3dec28ab5eade444a9a9b21d33980ca, type: 2}
 --- !u!1001 &280888744
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -77530,6 +77546,7 @@ GameObject:
   - component: {fileID: 1230745136}
   - component: {fileID: 1230745137}
   - component: {fileID: 1230745139}
+  - component: {fileID: 1230745140}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -77575,8 +77592,10 @@ MonoBehaviour:
   moveSpeed: 20
   sprintMultiplier: 1.6
   lookSensitivity: 0.08
+  gamepadLookSensitivity: 180
   pitchMin: -85
   pitchMax: 85
+  virtualMouse: {fileID: 0}
   jumpImpulse: 6
   groundCheckRadius: 0.2
   groundMask:
@@ -77968,6 +77987,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1230745140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1230745122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e1c83c5f69c5d4192661a0df93a4a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialObjectiveController
+  inventoryUI: {fileID: 0}
+  playerInventory: {fileID: 0}
+  stoneAxeItem: {fileID: 11400000, guid: 4cdd1766e5995004f99c1ac75df1eaa8, type: 2}
+  stonePickaxeItem: {fileID: 11400000, guid: 3f0dc44ff817b684a8f8ec0d587b850a, type: 2}
+  radioItem: {fileID: 11400000, guid: f32349bb16ec5164b90530bb232bd1ad, type: 2}
 --- !u!1001 &1231074287
 PrefabInstance:
   m_ObjectHideFlags: 0

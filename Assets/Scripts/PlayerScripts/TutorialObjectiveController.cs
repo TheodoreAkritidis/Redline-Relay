@@ -22,8 +22,9 @@ public sealed class TutorialObjectiveController : MonoBehaviour
 
     private const string IntroText =
         "Press Esc to pause or leave any menu\n" +
-        "W, A, S, D to move, hold Shift to sprint, Space to jump\n" +
-        "C to craft\n\n" +
+        "W, A, S, D to move (left gamepad stick), \n" +
+        "hold Shift to sprint (L3), Space to jump (A)\n" +
+        "C to craft (=), E to interact (Y) \n\n" +
         "First, craft a stone axe and stone pickaxe.";
 
     private const string SmeltingText =
@@ -36,10 +37,15 @@ public sealed class TutorialObjectiveController : MonoBehaviour
 
     private void Awake()
     {
-        if (inventoryUI == null)
+        TryResolveReferences();
+    }
+
+    private void TryResolveReferences()
+    {
+        if (inventoryUI == null || !inventoryUI.isActiveAndEnabled)
             inventoryUI = FindFirstObjectByType<InventoryUITKView>();
 
-        if (playerInventory == null)
+        if (playerInventory == null || !playerInventory.isActiveAndEnabled)
             playerInventory = FindFirstObjectByType<PlayerInventoryComponent>();
     }
 
