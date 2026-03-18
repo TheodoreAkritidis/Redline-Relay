@@ -15,14 +15,18 @@ MonoBehaviour:
   ItemId: gold_ore
   MaxStack: 5
   Icon: {fileID: 21300000, guid: 6a77d8da3c13a794a89d7933b3837190, type: 3}
-  WorldPrefab: {fileID: 0}
+  WorldPrefab: {fileID: 271413880565636275, guid: 6b8521c70570c594a9fce26401b1a007, type: 3}
   DestroyOnUse: 0
   IsFood: 0
   FoodValue: 0
   IsWater: 0
   WaterValue: 0
+  isWeapon: 0
+  WeaponValue: 0
   IsOre: 1
   SmeltResult: {fileID: 11400000, guid: 84da480eaefede34ca954d80d9325eb3, type: 2}
   SmeltSecondsPerItem: 120
   IsFuel: 0
   FuelSeconds: 10
+  AppliesStatus: 0
+  Status: None

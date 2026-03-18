@@ -26,6 +26,11 @@ public sealed class GamepadMenuCursor : MonoBehaviour
     [SerializeField] private AudioSource hoverAudioSource;
     [SerializeField] private AudioClip hoverClip;
 
+
+    [SerializeField] private float inventoryCursorCaptureSeconds = 0.2f;
+
+    private float lastGamepadCursorUseTime = -999f;
+
     private VisualElement root;
     private VisualElement cursorVisual;
     private VisualElement hoveredElement;
@@ -76,7 +81,8 @@ public sealed class GamepadMenuCursor : MonoBehaviour
         EnsureCursorBuilt();
 
         bool active = IsActiveForCurrentUI();
-        cursorVisual.style.display = active ? DisplayStyle.Flex : DisplayStyle.None;
+        bool showCursor = active && (Time.unscaledTime - lastGamepadCursorUseTime <= 2f);
+        cursorVisual.style.display = showCursor ? DisplayStyle.Flex : DisplayStyle.None;
 
         if (!active)
         {
@@ -101,6 +107,14 @@ public sealed class GamepadMenuCursor : MonoBehaviour
         if (move.sqrMagnitude < deadzone * deadzone)
             move = Vector2.zero;
 
+            bool gamepadDrivingCursor =
+        move != Vector2.zero ||
+        (submitAction != null && submitAction.action.WasPressedThisFrame()) ||
+        (alternateAction != null && alternateAction.action.WasPressedThisFrame());
+
+        if (gamepadDrivingCursor)
+            lastGamepadCursorUseTime = Time.unscaledTime;
+
         cursorPos.x += move.x * cursorSpeed * Time.unscaledDeltaTime;
         cursorPos.y -= move.y * cursorSpeed * Time.unscaledDeltaTime;
 
@@ -119,7 +133,15 @@ public sealed class GamepadMenuCursor : MonoBehaviour
         cursorVisual.style.top = cursorPos.y - cursorSize.y * 0.5f;
 
         if (inventoryUI != null)
-            inventoryUI.SetExternalCursorPosition(cursorPos);
+        {
+            bool keepGamepadCursorActive =
+                Time.unscaledTime - lastGamepadCursorUseTime <= inventoryCursorCaptureSeconds;
+
+            if (keepGamepadCursorActive)
+                inventoryUI.SetExternalCursorPosition(cursorPos);
+            else
+                inventoryUI.ClearExternalCursorPosition();
+        }
 
         var picked = root.panel?.Pick(cursorPos) as VisualElement;
         var hoverTarget = ResolveHoverTarget(picked);
@@ -149,6 +171,9 @@ public sealed class GamepadMenuCursor : MonoBehaviour
 
     private bool IsActiveForCurrentUI()
     {
+        if (Gamepad.current == null)
+            return false;
+
         if (inventoryUI != null)
             return inventoryUI.IsBackpackOpen || inventoryUI.IsCraftingOpen || inventoryUI.IsSmelterOpen;
 

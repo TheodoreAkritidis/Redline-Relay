@@ -1584,7 +1584,11 @@ public sealed class InventoryUITKView : MonoBehaviour
 
         Vector2 cursorPos;
 
-        if (_hasExternalCursorPos)
+        if (_hasPanelPointerPos && !_hasExternalCursorPos)
+        {
+            cursorPos = _lastPanelPointerPos;
+        }
+        else if (_hasExternalCursorPos)
         {
             cursorPos = _externalCursorPos;
         }
