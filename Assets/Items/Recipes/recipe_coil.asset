@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: recipe_coil
   m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipe
   DisplayName: Coil
-  OutputItem: {fileID: 0}
+  OutputItem: {fileID: 11400000, guid: 805ffe899d0be0041895bcb910bd1aeb, type: 2}
   OutputAmount: 1
   Ingredients:
-  - Item: {fileID: 0}
-    Amount: 0
+  - Item: {fileID: 11400000, guid: af2c63d3e1f8d5d488bb85bdaebee7be, type: 2}
+    Amount: 1
+  - Item: {fileID: 11400000, guid: 485eb8f55c20f34408cc4fdfb932ef59, type: 2}
+    Amount: 2
