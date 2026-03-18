@@ -6,7 +6,7 @@ public class EnemyController : MonoBehaviour
     [Header("Enemy Reference")]
     [SerializeField] float enemyWanderSpeed = 5f;
     [SerializeField] float enemyChaseSpeed = 5f;
-    [SerializeField] float stopDistance = 2f;
+    [SerializeField] float stopDistance = 5f;
     public float direction = 1f;
     public float wanderRadius = 20f;
     private Vector3 spawnPosition;
@@ -23,7 +23,7 @@ public class EnemyController : MonoBehaviour
     private bool playerDetected = false;
 
     [Header("Attack")]
-    public float attackRange = 2f;
+    public float attackRange = 5f;
     public float attackDamage = 5f;
     public float attackCooldown = 5f; // controls the amount of time before an enemy can attack again
 
