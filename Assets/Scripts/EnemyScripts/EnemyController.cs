@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IInteractable, IAttackable
 {
     [Header("Enemy Reference")]
     [SerializeField] float enemyWanderSpeed = 5f;
@@ -208,6 +208,41 @@ public class EnemyController : MonoBehaviour
     {
         transform.position = spawnPosition;
         ChooseTarget();
+    }
+
+    // IInteractable
+    public string GetPrompt()
+    {
+        return "Attack";
+    }
+
+    public void Interact(GameObject interactor)
+    {
+        // When the player presses the generic interact key while pointing at the enemy,
+        // perform a simple attack using the player's currently selected hotbar item if available,
+        // otherwise use a small default damage.
+        if (interactor == null) return;
+
+        var inv = interactor.GetComponent<PlayerInventoryComponent>();
+        float damage = 5f; // default unarmed/interact damage
+
+        if (inv != null)
+        {
+            var item = inv.GetSelectedHotbarItem();
+            if (item != null && item.isWeapon)
+            {
+                damage = item.WeaponValue;
+            }
+        }
+
+        TakeDamage(damage);
+    }
+
+    // IAttackable
+    public string GetAttackPrompt()
+    {
+        // Popup message for when the player is aiming at the enemy
+        return "F to Attack";
     }
 
 }

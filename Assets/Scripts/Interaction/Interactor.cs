@@ -82,7 +82,15 @@ public sealed class Interactor : MonoBehaviour
                 }
                 else
                 {
-                    inventoryUI?.SetCrosshairPrompt(current.GetPrompt());
+                    // If the target can provide a custom attack prompt (e.g. enemies), show a raw message
+                    if (interactable is IAttackable attackable)
+                    {
+                        inventoryUI?.SetCrosshairMessage(attackable.GetAttackPrompt());
+                    }
+                    else
+                    {
+                        inventoryUI?.SetCrosshairPrompt(current.GetPrompt());
+                    }
                 }
 
                 return;
