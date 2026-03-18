@@ -16,9 +16,12 @@ public class SimpleFpsController : MonoBehaviour
     [SerializeField] private float sprintMultiplier = 1.6f;
 
     [Header("Look")]
-    [SerializeField] private float lookSensitivity = 0.08f;
+    [SerializeField] private float lookSensitivity = 0.08f;          // mouse
+    [SerializeField] private float gamepadLookSensitivity = 180f;    // degrees/sec feel
     [SerializeField] private float pitchMin = -85f;
     [SerializeField] private float pitchMax = 85f;
+
+    [SerializeField] private UnityEngine.InputSystem.UI.VirtualMouseInput virtualMouse;
 
     [Header("Jump")]
     [SerializeField] private float jumpImpulse = 6f;
@@ -36,9 +39,10 @@ public class SimpleFpsController : MonoBehaviour
     [SerializeField] private Interactor interactor;   // assign (optional but recommended)
 
     [Header("SoundEffects")]
-    [SerializeField] private AudioSource jumpSound;   
-   
+    [SerializeField] private AudioSource jumpSound;
 
+
+    private PlayerInput playerInput;
 
     private GUIStyle speedStyle;
     private Rigidbody rb;
@@ -59,7 +63,14 @@ public class SimpleFpsController : MonoBehaviour
     private bool UiBlocked => inventoryOpen || craftingOpen || smelterOpen || (devConsole != null && devConsole.IsOpen);
 
     private bool sprintAllowed = true;
+    private void SetCursorMode(bool open)
+    {
+        Cursor.lockState = open ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = open;
 
+        if (virtualMouse != null)
+            virtualMouse.enabled = open;
+    }
     public void SetSprintAllowed( bool allowed )
     {
         sprintAllowed = allowed;
@@ -76,6 +87,7 @@ public class SimpleFpsController : MonoBehaviour
         if ( interactor == null ) interactor = GetComponent<Interactor>();
 
         rb = GetComponent<Rigidbody>();
+        playerInput = GetComponent<PlayerInput>();
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.constraints |= RigidbodyConstraints.FreezeRotation;
 
@@ -99,8 +111,17 @@ public class SimpleFpsController : MonoBehaviour
         if ( UiBlocked )
             return;
 
-        yaw += lookDelta.x * lookSensitivity;
-        pitch -= lookDelta.y * lookSensitivity;
+        bool usingGamepad =
+        playerInput != null &&
+        !string.IsNullOrEmpty(playerInput.currentControlScheme) &&
+        playerInput.currentControlScheme.IndexOf("Gamepad", System.StringComparison.OrdinalIgnoreCase) >= 0;
+
+        float appliedLookSensitivity = usingGamepad
+            ? gamepadLookSensitivity * Time.deltaTime
+            : lookSensitivity;
+
+        yaw += lookDelta.x * appliedLookSensitivity;
+        pitch -= lookDelta.y * appliedLookSensitivity;
         pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
 
         rb.MoveRotation(Quaternion.Euler(0f, yaw, 0f));
@@ -176,15 +197,13 @@ public class SimpleFpsController : MonoBehaviour
             sprintHeld = false;
             jumpQueued = false;
 
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            SetCursorMode(true);
         }
         else
         {
             if (devConsole == null || !devConsole.IsOpen)
             {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
+                SetCursorMode(false);
             }
         }
 
@@ -208,16 +227,14 @@ public class SimpleFpsController : MonoBehaviour
             sprintHeld = false;
             jumpQueued = false;
 
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            SetCursorMode(true);
         }
         else
         {
             // If console is open, don't re-lock the cursor here.
             if ( devConsole == null || !devConsole.IsOpen )
             {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
+                SetCursorMode(false);
             }
         }
 
@@ -243,15 +260,13 @@ public class SimpleFpsController : MonoBehaviour
             sprintHeld = false;
             jumpQueued = false;
 
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            SetCursorMode(true);
         }
         else
         {
             if ( devConsole == null || !devConsole.IsOpen )
             {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
+                SetCursorMode(false);
             }
         }
 
