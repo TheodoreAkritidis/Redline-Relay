@@ -15,4 +15,6 @@ MonoBehaviour:
   DisplayName: 
   OutputItem: {fileID: 0}
   OutputAmount: 1
-  Ingredients: []
+  Ingredients:
+  - Item: {fileID: 0}
+    Amount: 0
