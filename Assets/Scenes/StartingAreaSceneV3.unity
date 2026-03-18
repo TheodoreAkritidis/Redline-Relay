@@ -18486,7 +18486,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CraftingRecipeDatabase
   recipes:
   - {fileID: 11400000, guid: 5e94f120faec41e428ae3836d1b38547, type: 2}
-  - {fileID: 11400000, guid: d6646910c24c8b048b85c4cc92c5e09b, type: 2}
   - {fileID: 11400000, guid: ec2a11dc15ac9f84e8a7b7562b0215cf, type: 2}
   - {fileID: 11400000, guid: fcfe483547b7e7b4ba5eb6443d8b861d, type: 2}
   - {fileID: 11400000, guid: 5d21b002fab21d04481234ad3839281e, type: 2}
@@ -81890,7 +81889,8 @@ MonoBehaviour:
   thirstDrainRate: 0.1
   maxHealth: 100
   health: 100
-  healingRate: 0.75
+  regenRate: 0.75
+  regenThreshold: 0.75
   healthDrainRatePoison: 1
   healthDrainRateTemp: 0.01
   healthDrainRateHunger: 0.2
