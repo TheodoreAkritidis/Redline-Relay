@@ -57,10 +57,10 @@ public class ItemUsage : MonoBehaviour
 
         if (item is CanteenItem canteen)
         {
-            Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
+            // Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
             DrinkCanteen(stack, canteen);
-            Debug.Log("Drank from Canteen");
-            Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
+            // Debug.Log("Drank from Canteen");
+            // Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
         }
 
         if (item.AppliesStatus)

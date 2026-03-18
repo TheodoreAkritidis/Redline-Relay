@@ -20,7 +20,6 @@ public class PlayerHUD : MonoBehaviour
     [SerializeField] private Image tempFill;
 
     [Header("Statuses")]
-    [SerializeField] private StatusManager status;
     [SerializeField] private GameObject poisonIcon;
     [SerializeField] private GameObject healingIcon;
 
@@ -28,11 +27,6 @@ public class PlayerHUD : MonoBehaviour
     {
         poisonIcon.SetActive(false);
         healingIcon.SetActive(false);
-
-        if ( status == null )
-        {
-            status = FindFirstObjectByType<StatusManager>();
-        }
     }
 
     public void SetHunger( float current, float max )
@@ -65,24 +59,61 @@ public class PlayerHUD : MonoBehaviour
         tempFill.fillAmount = n;
     }
 
-    public void SetActivePoisonIcon( )
+    public void SetActivePoisonIcon()
     {
-        status.SetNewStatusIcon(poisonIcon);
+        RectTransform poisonRT = poisonIcon.GetComponent<RectTransform>();
+        RectTransform healRT = healingIcon.GetComponent<RectTransform>();
+
+        if (healingIcon.activeSelf)
+        {
+            poisonRT.anchoredPosition = new Vector2(70, poisonRT.anchoredPosition.y);
+        }
+        else
+        {
+            poisonRT.anchoredPosition = new Vector2(0, poisonRT.anchoredPosition.y);
+        }
+
+        poisonIcon.SetActive(true);
     }
 
-    public void SetInactivePoisonIcon( )
+    public void SetInactivePoisonIcon()
     {
-        status.RemoveStatusIcon(poisonIcon);
+        RectTransform healRT = healingIcon.GetComponent<RectTransform>();
 
+        if (healingIcon.activeSelf)
+        {
+            healRT.anchoredPosition = new Vector2(0, healRT.anchoredPosition.y);
+        }
+
+        poisonIcon.SetActive(false);
     }
 
-    public void SetActiveHealingIcon( )
+    public void SetActiveHealingIcon()
     {
-        status.SetNewStatusIcon(healingIcon);
+        RectTransform healRT = healingIcon.GetComponent<RectTransform>();
+        RectTransform poisonRT = poisonIcon.GetComponent<RectTransform>();
+
+        if (poisonIcon.activeSelf)
+        {
+            healRT.anchoredPosition = new Vector2(70, healRT.anchoredPosition.y);
+        }
+        else
+        {
+            healRT.anchoredPosition = new Vector2(0, healRT.anchoredPosition.y);
+        }
+
+        healingIcon.SetActive(true);
     }
 
-    public void SetInactiveHealingIcon( )
+    public void SetInactiveHealingIcon()
     {
-        status.RemoveStatusIcon(healingIcon);
+        RectTransform poisonRT = poisonIcon.GetComponent<RectTransform>();
+
+        if (poisonIcon.activeSelf)
+        {
+            poisonRT.anchoredPosition = new Vector2(0, poisonRT.anchoredPosition.y);
+        }
+
+        healingIcon.SetActive(false);
     }
 }

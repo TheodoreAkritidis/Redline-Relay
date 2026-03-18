@@ -18,11 +18,15 @@ MonoBehaviour:
   WorldPrefab: {fileID: 5906608606846821691, guid: 3f2f62d56b678ca45adc3c69e99e57a9, type: 3}
   DestroyOnUse: 1
   IsFood: 1
-  FoodValue: 10
+  FoodValue: 5
   IsWater: 1
   WaterValue: 5
+  isWeapon: 0
+  WeaponValue: 0
   IsOre: 0
   SmeltResult: {fileID: 0}
   SmeltSecondsPerItem: 5
   IsFuel: 0
   FuelSeconds: 10
+  AppliesStatus: 0
+  Status: 

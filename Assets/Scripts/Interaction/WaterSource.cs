@@ -43,15 +43,15 @@ public sealed class WaterSource : MonoBehaviour, IInteractable
 
                 if ( stack.CanteenCapacity >= canteen.MaxCapacity - 1)
                 {
-                    Debug.Log("Canteen Full");
-                    Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
+                    // Debug.Log("Canteen Full");
+                    // Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
                     return;
                 }
 
                 stack.CanteenCapacity = Mathf.Min(canteen.MaxCapacity, stack.CanteenCapacity + canteen.FillAmount);
                 Inv.SetSelectedHotbarStack(stack);
-                Debug.Log("Filled Canteen");
-                Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
+                // Debug.Log("Filled Canteen");
+                // Debug.Log($"Capacity: {stack.CanteenCapacity} / {canteen.MaxCapacity}");
                 return;
             }
 
