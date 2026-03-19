@@ -25,7 +25,7 @@ public class EnemyController : MonoBehaviour, IInteractable, IAttackable
     [Header("Attack")]
     public float attackRange = 5f;
     public float attackDamage = 5f;
-    public float attackCooldown = 5f; // controls the amount of time before an enemy can attack again
+    public float attackCooldown = 10f; // controls the amount of time before an enemy can attack again
 
     [Header("Health")]
     public float maxHealth = 20f;
