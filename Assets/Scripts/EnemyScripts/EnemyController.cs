@@ -242,7 +242,7 @@ public class EnemyController : MonoBehaviour, IInteractable, IAttackable
     public string GetAttackPrompt()
     {
         // Popup message for when the player is aiming at the enemy
-        return "F to Attack";
+        return "E to Attack";
     }
 
 }

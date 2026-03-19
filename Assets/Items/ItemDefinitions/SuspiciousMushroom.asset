@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   ItemId: suspicious_mushroom
   MaxStack: 20
-  Icon: {fileID: 21300000, guid: 8961a589d87bf694097da7b56cea2644, type: 3}
+  Icon: {fileID: 21300000, guid: 1d69b57e15c419843875c88b85515d6d, type: 3}
   WorldPrefab: {fileID: 100000, guid: 1ab22d21cc8b58a4098dad416a2ee85c, type: 3}
   DestroyOnUse: 1
   IsFood: 1

@@ -363,7 +363,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   enemyWanderSpeed: 5
   enemyChaseSpeed: 5
-  stopDistance: 6
+  stopDistance: 3
   direction: 1
   wanderRadius: 20
   player: {fileID: 0}
